@@ -7,7 +7,9 @@ public class PlayerInput : MonoBehaviour
 
     public Vector2 InputVector => _inputVector;
 
-    // InputSystem
+    /// <summary>
+    /// InputSystem
+    /// </summary>
     private void InputKeyboardValue(ref Vector2 inputVector)
     {
         inputVector = Vector2.zero;
@@ -15,7 +17,6 @@ public class PlayerInput : MonoBehaviour
         float h = 0;
         float v = 0;
 
-        // isPressed는 해당 키를 누르고 있는 동안 true가 되는 프로퍼티입니다.
         if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed)  h = -1;
         if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) h = 1;
         if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed)    v = 1;
@@ -24,9 +25,11 @@ public class PlayerInput : MonoBehaviour
         inputVector = new Vector2(h, v);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Keyboard.current is not null) InputKeyboardValue(ref _inputVector);
+        if (Keyboard.current is not null)
+        {
+            InputKeyboardValue(ref _inputVector);
+        }
     }
 }

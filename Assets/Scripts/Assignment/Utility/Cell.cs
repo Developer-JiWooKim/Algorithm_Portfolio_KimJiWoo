@@ -11,6 +11,7 @@ public class Cell
     public bool eastWall  = true;  
     public bool westWall  = true;  
 
+    // 셀 중앙
     public UnityEngine.Vector3 worldCenter;
 
     public Cell(int col, int row, UnityEngine.Vector3 worldCenter)

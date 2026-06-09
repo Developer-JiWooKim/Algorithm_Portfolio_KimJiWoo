@@ -5,7 +5,7 @@ public class MazeGenerator : MonoBehaviour
 {
     [Header("Gird")]
     [SerializeField] private int    _cols = 10; // 가로
-    [SerializeField] private int    _rows= 10;  // 세로
+    [SerializeField] private int    _rows = 10; // 세로
     [SerializeField] private float  _cellSize = 5f;
 
     [Header("시작 점")]
@@ -29,6 +29,10 @@ public class MazeGenerator : MonoBehaviour
     public float CellSize => _cellSize;
 
     private void Awake() => Generate();
+
+    /// <summary>
+    /// 미로 생성 메소드
+    /// </summary>
     public void Generate()
     {
         ClearWalls();
@@ -37,7 +41,9 @@ public class MazeGenerator : MonoBehaviour
         SpawnWalls();
     }
 
-    // Wall이 담긴 리스트 초기화
+    /// <summary>
+    /// Wall이 담긴 리스트 초기화
+    /// </summary>
     public void ClearWalls()
     {
         foreach (var wall in _wallObjects)
@@ -51,7 +57,9 @@ public class MazeGenerator : MonoBehaviour
         _wallObjects.Clear();
     }
 
-    // Grid 그려서 좌표 저장
+    /// <summary>
+    /// 10(_cols) x 10(_rows) 셀을 생성 후 각각의 센터를 구한 후 리스트에 저장
+    /// </summary>
     private void InitGrid()
     {
         _grid = new Cell[_cols, _rows];
@@ -67,7 +75,9 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    // 깊이 기반(DFS) 벽 생성할 위치 탐색
+    /// <summary>
+    /// 깊이 기반(DFS) 벽 생성할 위치 탐색
+    /// </summary>
     private void RunDFS()
     {
         // 매번 다른 맵이 나오도록 시드값 설정
@@ -109,32 +119,42 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    // 범위 내(Grid)에서 현재 셀 주위에 이웃한 미방문 셀 검사
+    /// <summary>
+    /// 범위 내(Grid)에서 현재 셀 주위에 이웃한 미방문 셀 검사
+    /// </summary>
     private List<Cell> GetUnvisitedNeighbors(Cell cell)
     {
         var list = new List<Cell>(4);
         int c = cell.col;
         int r = cell.row;
 
-        if (r + 1 < _rows && !_grid[c, r + 1].visited) list.Add(_grid[c, r + 1]); // up
-        if (r - 1 >= 0    && !_grid[c, r - 1].visited) list.Add(_grid[c, r - 1]); // down
-        if (c + 1 < _cols && !_grid[c + 1, r].visited) list.Add(_grid[c + 1, r]); // right
-        if (c - 1 >= 0    && !_grid[c - 1, r].visited) list.Add(_grid[c - 1, r]); // left
+        if (r + 1 < _rows && !_grid[c, r + 1].visited) list.Add(_grid[c, r + 1]); // north
+        if (r - 1 >= 0    && !_grid[c, r - 1].visited) list.Add(_grid[c, r - 1]); // south
+        if (c + 1 < _cols && !_grid[c + 1, r].visited) list.Add(_grid[c + 1, r]); // east
+        if (c - 1 >= 0    && !_grid[c - 1, r].visited) list.Add(_grid[c - 1, r]); // west
 
         return list;
     }
 
+    /// <summary>
+    /// 두 셀 사이의 벽을 제거하는 메소드
+    /// </summary>
     private void RemoveWallBetween(Cell a, Cell b)
     {
+        // dc, dr로 두 셀의 상대적 위치를 파악해 어느 방향 벽을 제거할지 결정
         int dc = b.col - a.col;
         int dr = b.row - a.row;
 
+        // 두 셀은 벽을 공유하므로 양쪽 셀 모두 해당 방향 벽을 제거
         if      (dr == 1)   { a.northWall = false; b.southWall = false; }    
         else if (dr == -1)  { a.southWall = false; b.northWall = false; }    
-        else if (dc == 1)   { a.eastWall  = false; b.westWall = false; } 
+        else if (dc == 1)   { a.eastWall  = false; b.westWall  = false; } 
         else if (dc == -1)  { a.westWall  = false; b.eastWall  = false; } 
     }
 
+    /// <summary>
+    /// 벽들을 정해진 위치에 생성하는 메소드
+    /// </summary>
     private void SpawnWalls()
     {
         if (wallPrefab == null) return;
@@ -163,13 +183,13 @@ public class MazeGenerator : MonoBehaviour
                     Vector3 pos = new Vector3(cx + _cellSize * 0.5f, wallHeight * 0.5f, cz);
                     SpawnWall(pos, true, wallParent.transform);
                 }
-
+                // southWall은 r == 0(맨 아래 행)일 때만 처리, 인접한 두 셀이 같은 벽을 중복 생성하지 않도록 하기 위해
                 if (r == 0 && cell.southWall)
                 {
                     Vector3 pos = new Vector3(cx, wallHeight * 0.5f, cz - _cellSize * 0.5f);
                     SpawnWall(pos, false, wallParent.transform);
                 }
-
+                // westWall은 c == 0 (맨 왼쪽 열)일 때만 처리, 인접한 두 셀이 같은 벽을 중복 생성하지 않도록 하기 위해
                 if (c == 0 && cell.westWall)
                 {
                     Vector3 pos = new Vector3(cx - _cellSize * 0.5f, wallHeight * 0.5f, cz);
@@ -179,7 +199,9 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    // isVertical - true = Z축 방향 벽, false = X축 방향 벽
+    /// <summary>
+    /// 벽 하나 생성, isVertical -> true = Z축 방향 벽, false = X축 방향 벽
+    /// </summary>
     private void SpawnWall(Vector3 position, bool isVertical, Transform parent)
     {
         GameObject wall = Instantiate(wallPrefab, position, Quaternion.identity, parent);
@@ -191,6 +213,9 @@ public class MazeGenerator : MonoBehaviour
         _wallObjects.Add(wall);
     }
 
+    /// <summary>
+    /// 월드 좌표를 셀 위치로 변환하는 메소드
+    /// </summary>
     public Vector2Int WorldToCell(Vector3 worldPos)
     {
         int col = (int)((worldPos.x - worldStart.x) / _cellSize);
@@ -202,18 +227,28 @@ public class MazeGenerator : MonoBehaviour
         return new Vector2Int(col, row);
     }
 
+    /// <summary>
+    /// 셀 위치를 월드 좌표로 변환하는 메소드
+    /// </summary>
+    /// <param name="cell"></param>
+    /// <returns></returns>
     public Vector3 CellToWorld(Vector2Int cell)
     {
         return _grid[cell.x, cell.y].worldCenter;
     }
 
+    /// <summary>
+    /// [col, row] 위치에 있는 셀을 반환하는 메소드
+    /// </summary>
     public Cell GetCell(int col, int row)
     {
         if (col < 0 || col >= _cols || row < 0 || row >= _rows) return null;
         return _grid[col, row];
     }
 
-    // 에디터에서 그리드 확인용
+    /// <summary>
+    /// 에디터에서 그리드 확인용
+    /// </summary>
     private void OnDrawGizmos()
     {
         // 월드 범위 테두리

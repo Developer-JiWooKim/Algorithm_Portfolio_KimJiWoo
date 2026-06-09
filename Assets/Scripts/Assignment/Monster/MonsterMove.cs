@@ -10,13 +10,19 @@ public class MonsterMove : MonoBehaviour
     private List<Vector3> _path;
     private int           _pathIndex;
     private Vector2Int    _lastGoalCell = Vector2Int.zero;
-    private float         _sphereCastRaduis = 0.5f; // 몬스터 크기 Radius
+    private float         _sphereCastRaduis = 0.5f; // SphereCast 구체 Radius
 
+    /// <summary>
+    /// Idle 상태일 때 제자리 회전
+    /// </summary>
     public void IdleRotate()
     {
         transform.Rotate(0f, rotateSpeed * Time.deltaTime, 0f, Space.World);
     }
 
+    /// <summary>
+    /// 타겟 위치까지의 최단 거리를 구하는 AStarPathfinder로 Path를 생성
+    /// </summary>
     public void RequestPath(Vector3 targetPos)
     {
         if (AStarPathfinder.Instance == null) return;
@@ -36,22 +42,30 @@ public class MonsterMove : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// AStar 알고리즘으로 생성한 길 초기화
+    /// </summary>
     public void ClearPath()
     {
         _path = null;
         _pathIndex = 0;
     }
 
+    /// <summary>
+    /// 타겟 방향으로 이동
+    /// </summary>
     public void MoveToTarget(Vector3 targetPos)
     {
         if (IsPathClear(targetPos))
         {
+            // 타겟과 자신 사이에 장애물이 없으면 바로 타겟 방향으로 이동
             ClearPath();
             MoveStraight(targetPos);
         }
         else
         {
             RequestPath(targetPos);
+
             // 길이 없거나 끝에 도달했으면 타겟 방향으로 직진
             if (_path == null || _pathIndex >= _path.Count)
             {
@@ -69,10 +83,14 @@ public class MonsterMove : MonoBehaviour
                 return;
             }
 
+            // 정해진 목표 노드의 센터로 이동
             MoveStraight(nodePos);
         }
     }
 
+    /// <summary>
+    /// 타겟 방향으로 회전, 공격 범위 안에 있을 때 플레이어를 바라보게 하는 메소드
+    /// </summary>
     public void LookAtTarget(Vector3 targetPos)
     {
         Vector3 dir = targetPos - transform.position;
@@ -83,7 +101,9 @@ public class MonsterMove : MonoBehaviour
         RotateToward(dir.normalized);
     }
 
-    // SphereCast로 현재 타겟과 자신 사이에 벽이 있는지 체크
+    /// <summary>
+    /// 타겟과 자신 사이에 장애물이 있는지 검사, SphereCast로 현재 타겟과 자신 사이에 벽이 있는지 체크
+    /// </summary>
     private bool IsPathClear(Vector3 targetPos)
     {
         Vector3 origin = transform.position + Vector3.up * 0.5f;
@@ -94,6 +114,9 @@ public class MonsterMove : MonoBehaviour
         return !Physics.SphereCast(origin, _sphereCastRaduis, direction.normalized, out _, distance, LayerMask.GetMask("Wall"));
     }
 
+    /// <summary>
+    /// 타겟의 방향으로 이동
+    /// </summary>
     private void MoveStraight(Vector3 targetPos)
     {
         Vector3 dir = targetPos - transform.position;
@@ -108,6 +131,9 @@ public class MonsterMove : MonoBehaviour
         transform.Translate(dir * moveSpeed * Time.deltaTime, Space.World);
     }
 
+    /// <summary>
+    ///  dir 방향으로 부드러운 회전 적용
+    /// </summary>
     private void RotateToward(Vector3 dir)
     {
         Quaternion targetRotation = Quaternion.LookRotation(dir, Vector3.up);

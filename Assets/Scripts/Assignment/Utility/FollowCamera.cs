@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// 플레이어 이동 시 부드럽게 따라가는 컴포넌트
+/// </summary>
 public class FollowCamera : MonoBehaviour
 {
     [SerializeField] private Transform target;

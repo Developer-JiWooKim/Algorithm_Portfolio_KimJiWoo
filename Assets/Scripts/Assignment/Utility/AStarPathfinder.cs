@@ -5,10 +5,11 @@ public class AStarPathfinder : MonoBehaviour
 {
     [SerializeField] private MazeGenerator mazeGenerator;
 
-    private int _cost = 10;
+    private int _cost = 10; // 한 셀 이동 비용
 
     private static AStarPathfinder _instance;
     public static AStarPathfinder Instance { get; private set; }
+
     private void Awake()
     {
         if (_instance == null)
@@ -21,11 +22,17 @@ public class AStarPathfinder : MonoBehaviour
         }        
     }
 
+    /// <summary>
+    /// 월드 좌표를 셀 인덱스로 변환하는 메소드
+    /// </summary>
     public Vector2Int WorldToCell(Vector3 worldPos)
     {
         return mazeGenerator.WorldToCell(worldPos);
     }
 
+    /// <summary>
+    /// A* 알고리즘으로 시작 지점에서 목표 지점까지의 최단 경로를 탐색하는 메소드
+    /// </summary>
     public List<Vector3> FindPath(Vector3 startWorld, Vector3 goalWorld)
     {
         // 시작 지점과 목표지점의 셀을 구함
@@ -62,7 +69,7 @@ public class AStarPathfinder : MonoBehaviour
             {
                 if (closedSet.Contains(neighbor)) continue;
 
-                // 한 셀 이동 비용 책정
+                // 셀 이동 비용 책정
                 int newGCost = gCost[current] + _cost;
 
                 if (!gCost.ContainsKey(neighbor) || newGCost < gCost[neighbor])
@@ -80,19 +87,25 @@ public class AStarPathfinder : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// 목표 셀에서 cameFrom을 역방향으로 따라가 경로를 복원하는 메소드
+    /// </summary>
     private List<Vector3> BuildPath(Dictionary<Vector2Int, Vector2Int> cameFrom, Vector2Int current)
     {
         List<Vector2Int> path = new List<Vector2Int>();
         path.Add(current);
 
+        // 목표 -> 시작 순서로 역추적하며 path에 저장
         while (cameFrom.ContainsKey(current))
         {
             current = cameFrom[current];
             path.Add(current);
         }
 
+        // 시작 -> 목표 순서로 path 반전
         path.Reverse();
 
+        // 첫 번째 노드 제거, 몬스터가 이동 중 자신의 셀 중앙으로 가기 위해 뒤로 이동하는 현상 방어
         if(path.Count > 1)
         {
             path.RemoveAt(0);
@@ -100,6 +113,7 @@ public class AStarPathfinder : MonoBehaviour
 
         List<Vector3> worldPath = new List<Vector3>();
 
+        // 셀 인덱스를 월드 좌표로 변환
         foreach (Vector2Int node in path)
         {
             worldPath.Add(mazeGenerator.CellToWorld(node));
@@ -108,6 +122,9 @@ public class AStarPathfinder : MonoBehaviour
         return worldPath;
     }
 
+    /// <summary>
+    /// 현재 셀에서 이동 가능한 이웃 셀 반환하는 메소드
+    /// </summary>
     private List<Vector2Int> GetNeighbors(Vector2Int node)
     {
         // 4방향(한 셀에 존재하는 4방향의 벽 기반으로 이동 가능한 셀 구함
@@ -128,6 +145,9 @@ public class AStarPathfinder : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// openSet에서 F값이 가장 낮은 셀 반환하는 메소드
+    /// </summary>
     private Vector2Int GetLowestF(List<Vector2Int> openSet, Dictionary<Vector2Int, int> gCost, Vector2Int goal)
     {
         Vector2Int best = openSet[0];
@@ -147,6 +167,11 @@ public class AStarPathfinder : MonoBehaviour
         return best;
     }
 
+    /// <summary>
+    /// F 값 계산하는 메소드
+    /// G - 시작 노드에서 현재 노드까지 이동 비용 
+    /// H - 현재 노드에서 목표까지 맨해튼 거리
+    /// </summary>
     private int GetF(Vector2Int node, Dictionary<Vector2Int, int> gCost, Vector2Int goal)
     {
         int g = gCost.ContainsKey(node) ? gCost[node] : 9999;

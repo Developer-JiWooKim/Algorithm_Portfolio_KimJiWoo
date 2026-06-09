@@ -12,11 +12,14 @@ public class PlayerController : MonoBehaviour
     public int CurrentHp => _currentHp;
     public int MaxHp => maxHp;
 
-    public System.Action<int, int> OnHPChanged;  // (현재, 최대)
-    public System.Action OnDead;
+    public event System.Action<int, int> OnHPChanged;  // 체력이 변경됐을 때 (현재, 최대) 이벤트
+    public event System.Action OnDead;                 // 플레이어 체력이 0이 되어 죽었을 때 이벤트 
 
     private void Awake() => Initialize();
 
+    /// <summary>
+    /// 초기화 메소드
+    /// </summary>
     private void Initialize()
     {
         _playerInput = GetComponent<PlayerInput>();
@@ -27,11 +30,16 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        // PlayerInput 컴포넌트에서 감지한 플레이어 입력 값(Vector2)을 Vector3로 바꿔서 변수에 저장 
         Vector3 dir = new Vector3(_playerInput.InputVector.x, 0, _playerInput.InputVector.y);
 
+        // PlayerMove 컴포넌트에 방향과 속력을 전달해서 플레이어를 이동
         _playerMove.Move(dir, moveSpeed);
     }
 
+    /// <summary>
+    /// 몬스터 공격 범위 안에 닿았을 때 호출될 메소드
+    /// </summary>
     public void TakeDamage()
     {
         if (_currentHp <= 0) return;
