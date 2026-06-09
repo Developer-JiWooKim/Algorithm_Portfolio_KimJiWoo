@@ -29,19 +29,38 @@
         - Slerp(구면 선형 보간): 현재 회전에서 목표 회전까지 부드럽게 보간
         
     - sqrMagnitude를 사용한 거리 기반 감지(MonsterSight.cs)
+        - TODO# 이 부분 찾아서 사용한 공식 넣기
 
     - 자료구조 활용
-        List
-        Dictionart
-        HashSet
+        - List: 경로 노드, 스폰 후보 셀, 몬스터 목록 관리
+        - Dictionary: A* 탐색에서 g비용, 경로 역추적 부모 노드 저장
+        - HashSet: A* 탐색에서 처리 완료 노드 저장 (중복 탐색 방지)
+        - Stack: DFS 미로 생성에서 백트래킹 구현 (LIFO 구조)
 
     - 충돌 이벤트(Collider - Trigger 이벤트)
+        - 몬스터 자식 오브젝트의 Sphere Collider (Is Trigger = true)로 공격 범위 구현
+        - OnTriggerEnter: 플레이어 진입 감지 → PlayerInAttackRange = true
+        - OnTriggerExit:  플레이어 이탈 감지 → PlayerInAttackRange = false
+        - MonsterController가 매 Update마다 PlayerInAttackRange를 읽어 Attack 상태 전환
 
     - 내적 시야 감지 (MonsterSight.cs)
+        - dirToPlayer.y = 0으로 XZ 평면(수평)으로 변환 후 정규화
+        - Vector3.Dot으로 몬스터 forward와 플레이어 방향의 사잇각 코사인 값 계산
+        - Mathf.Clamp(dot, -1, 1): 부동소수점 오차로 dot이 범위를 벗어나면 Mathf.Acos가 NaN을 반환하므로 반드시 Clamp로 방어
+        - Mathf.Acos(dot) * Mathf.Rad2Deg로 각도 변환 후 fieldOfView * 0.5f와 비교
+          (fieldOfView는 양측 전체 시야각, angle은 forward 기준 편측 각도이므로 절반과 비교)
+        - 시야각 판별 후 Physics.Raycast로 몬스터→플레이어 방향으로 Ray를 쏴 벽이 가로막고 있으면 감지 실패 처리
         - Vector3.Dot으로 몬스터 forward와 플레이어 방향의 사잇각 코사인 값 계산, Mathf.Acos(dot) * Mathf.Rad2Deg로 코사인 값을 각도록 변환 후 시야각 내에 플레이어가 있는지 판별
         - 시야각 판별 후 Physics.Raycast로 벽 뒤 감지를 차단
 
     - DFS 미로 생성 (MazeGenerator.cs)
+        - 스택 기반 깊이 우선 탐색으로 완벽한 미로 생성 (모든 셀이 연결됨)
+        - 시작 셀을 랜덤 선택 후 스택에 push, 미방문 이웃 셀을 랜덤 선택
+        - 선택한 이웃 셀과의 공유 벽을 양쪽 모두 제거 후 스택에 push
+        - 미방문 이웃이 없으면 스택에서 pop (백트래킹)
+        - 스택이 빌 때까지 반복 → 모든 셀 방문 완료
+        - seed = -1이면 DateTime.Now.Millisecond로 매번 다른 미로,
+          고정값 입력 시 항상 동일한 미로 재현 가능
         - 스택 기반 깊이 우선 탐색으로 미로를 생성
         - 시작 셀에서 랜덤한 미방문 이웃을 선택해 벽을 제거하며 이동하고 막히면 스택에서 꺼내 백 트래킹 -> 모든 셀이 방문될 때까지 반복하여 모든 셀이 연결된 미로를 생성함
 
