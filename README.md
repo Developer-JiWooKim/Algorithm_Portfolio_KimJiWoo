@@ -32,16 +32,19 @@
 - `transform.Translate`로 이동 처리
 
 
+
 ### Quternion.LookRotation, Quternion.Slerp 부드러운 회전 `PlayerMove.cs` `MonsterMove.cs`
 - `Quternion.LookRotation()` 사용해 방향 벡터를 Quaternion으로 변환
 - `Slerp`로 현재 회전에서 목표 회전까지 부드럽게 보간 처리
 
         
+
 ### sqrMagnitude 거리 기반 감지 `MonsterSight.cs`
 ```csharp
 dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡터 / detectionRange : 감지 범위
 ```
 - `Vector3.Distance()`는 내부적으로 sqrt를 호출해 연산 비용이 큼 -> sqrt 없이 제곱값끼리 비교하는 sqrMagnitude 사용
+
 
 
 ### 자료구조 활용
@@ -53,11 +56,13 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
 | `Stack` | DFS 미로 생성에서 백트래킹 구현 (LIFO 구조) |
 
 
+
 ### 충돌 이벤트(Collider - Trigger 이벤트) `MonterAttack.cs`
 - 몬스터 자식 오브젝트의 `Sphere Collider (Is Trigger = true)`로 공격 범위 구현
 - `OnTriggerEnter` : 플레이어 진입 감지 → `PlayerInAttackRange = true;`
 - `OnTriggerExit` :  플레이어 이탈 감지 → `PlayerInAttackRange = false;`
 - `MonsterController`가 매 `Update`마다 `PlayerInAttackRange`를 읽어 Attack 상태 전환, 플레이어의 체력을 닳게 하는 `TakeDamage` 호출 시도
+
 
 
 ### 내적 시야 감지 `MonsterSight.cs`
@@ -67,6 +72,7 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
 - `Mathf.Acos(dot) * Mathf.Rad2Deg`로 각도 변환 후 `fieldOfView * 0.5f`와 비교 
     - `fieldOfView`는 양측 전체 시야각, 위 계산으로 나온 `angle`은 forward 기준 편측 각도이므로 절반과 비교
 - 시야각 판별 후 `Physics.Raycast()`로 몬스터→플레이어 방향으로 Ray를 쏴 벽이 가로막고 있으면 감지 실패 처리
+
 
 
 ### DFS 미로 생성 `MazeGenerator.cs`
@@ -83,6 +89,7 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
     - 고정값 입력 시 항상 동일한 미로 재현 가능
 
 
+
 ### A\* 길찾기 `AStarPathfinder.cs`
 - `F = G + H` 공식으로 시작 노드에서 목표 노드까지 최단 경로 탐색
 
@@ -95,6 +102,7 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
 - **간선** : Cell의 벽 정보 (클래스 내부 bool형 변수들)로 판단, 벽이 없는 방향만 이웃으로 추가
 - 목표 도달 시 `cameFrom`을 역방향으로 따라가 경로 복원 후 `Reverse()`
 - 첫 번째 노드 (현재 몬스터가 있는 셀 중앙) 제거 → 몬스터가 플레이어 추격 중 자신의 셀 중앙으로, 뒤로 이동하는 현상 해결
+
 
 
 ### FSM 상태 전이 `MonsterFSM.cs`
@@ -115,6 +123,7 @@ Attack -(공격 범위 이탈)--> Chase
 | `Attack` | 공격 범위 진입 시 즉시 1 데미지. 3초 후에도 범위 안에 있으면 반복 데미지. 범위 이탈 시 Chase로 복귀 |
 
 
+
 ### SpereCast 최적화 `MonsterMove.cs`
 - `Physics.SphereCast`로 몬스터와 플레이어 사이에 벽 존재 여부를 먼저 확인
     - `Raycast`(선 하나)와 달리 구체를 굴려 체크하므로 몬스터 크기를 고려한 더 정확한 판단
@@ -130,18 +139,24 @@ Attack -(공격 범위 이탈)--> Chase
 | `List<Vector3> _path` | `MonsterMove.cs` | A\* 경로 노드를 순서대로 저장, `_pathIndex++`로 순차 접근하므로 인덱스 기반 접근에 유리한 List 사용 |
 | `List<Cell> candidates` | `MonsterSpawner.cs` | 스폰 가능한 셀 필터링 후 저장, Fisher-Yates 셔플에서 인덱스 기반 교환이 필요하므로 List 사용 |
 
+
+
 ### Dictionary
 
 | 변수 | 위치 | 선택 이유 |
 |---|---|---|
 | `Dictionary<Vector2Int, Vector2Int> cameFrom` | `AStarPathfinder.cs` | 각 노드의 부모 노드를 기록해 경로 역추적에 사용. 셀 좌표를 key로 빠른 접근이 필요하므로 Dictionary 사용 |
 | `Dictionary<Vector2Int, int> gCost` | `AStarPathfinder.cs` | 각 노드까지의 이동 비용(g값) 저장. 이웃 노드 탐색 시 기존 비용과 새 비용 비교가 빈번하므로 key로 접근 가능한 Dictionary 사용 |
-            
+
+
+
 ### HashSet
 
 | 변수 | 위치 | 선택 이유 |
 |---|---|---|
 | `HashSet<Vector2Int> closedSet` | `AStarPathfinder.cs` | 처리 완료 노드 저장, 중복 탐색 방지. 매 이웃 노드마다 포함 여부를 확인하므로 해시 함수 기반으로 `O(1)` 검색이 가능한 HashSet 사용 (List의 `Contains`는 `O(n)`) |
+
+
 
 ### Stack
 
