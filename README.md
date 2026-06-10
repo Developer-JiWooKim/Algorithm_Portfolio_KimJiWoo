@@ -78,7 +78,7 @@ Update()               → FSM 상태 전환 및 TryAttack() 처리
 <br>
 
 ### 내적 시야 감지 `MonsterSight.cs`
-- `dirToPlayer.y = 0` 으로 XZ 평면(수평)으로 변환 후 정규화 (`dirToPlayer` : 플레이어 방향 벡터)
+- `dirToPlayer.y = 0` 으로 XZ 평면(수평)으로 변환 후 정규화 (`dirToPlayer` : 내 위치에서 플레이어 방향 벡터)
 - `Vector3.Dot()`으로 몬스터 `forward`와 플레이어 방향의 사잇각 코사인 값 계산
 - `Mathf.Clamp(dot, -1, 1)` 처리 : 부동소수점 오차로 dot이 범위를 벗어나면 `Mathf.Acos`가 NaN을 반환하므로 반드시 Clamp로 방어 처리
 - `Mathf.Acos(dot) * Mathf.Rad2Deg`로 각도 변환 후 `fieldOfView * 0.5f`와 비교 
