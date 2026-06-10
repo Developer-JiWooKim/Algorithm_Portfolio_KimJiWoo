@@ -35,7 +35,7 @@
 <br>
 
 ### Quternion.LookRotation, Quternion.Slerp 부드러운 회전 `PlayerMove.cs` `MonsterMove.cs`
-- `Quternion.LookRotation()` 사용해 방향 벡터를 Quaternion으로 변환
+- `Quternion.LookRotation()` 사용해 목표 방향을 Quaternion으로 변환
 - `Slerp`로 현재 회전에서 목표 회전까지 부드럽게 보간 처리
     
 <br>
