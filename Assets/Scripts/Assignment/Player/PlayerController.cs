@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -30,6 +31,12 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        // 플레이어 키보드 입력 감지
+        if (Keyboard.current is not null)
+        {
+            _playerInput.InputKeyboardValue();
+        }
+
         // PlayerInput 컴포넌트에서 감지한 플레이어 입력 값(Vector2)을 Vector3로 바꿔서 변수에 저장 
         Vector3 dir = new Vector3(_playerInput.InputVector.x, 0, _playerInput.InputVector.y);
 

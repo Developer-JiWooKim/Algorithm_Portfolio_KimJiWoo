@@ -10,10 +10,8 @@ public class PlayerInput : MonoBehaviour
     /// <summary>
     /// InputSystem
     /// </summary>
-    private void InputKeyboardValue(ref Vector2 inputVector)
+    public void InputKeyboardValue()
     {
-        inputVector = Vector2.zero;
-
         float h = 0;
         float v = 0;
 
@@ -22,14 +20,6 @@ public class PlayerInput : MonoBehaviour
         if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed)    v = 1;
         if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed)  v = -1;
 
-        inputVector = new Vector2(h, v);
-    }
-
-    void Update()
-    {
-        if (Keyboard.current is not null)
-        {
-            InputKeyboardValue(ref _inputVector);
-        }
+        _inputVector = new Vector2(h, v);
     }
 }
