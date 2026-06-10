@@ -63,7 +63,7 @@ Update()               → FSM 상태 전환 및 TryAttack() 처리
 ```
 - `OnTriggerEnter` : 플레이어 공격 범위 진입 감지 → `PlayerInAttackRange = true;`
 - `OnTriggerExit`  : 플레이어 공격 범위 이탈 감지 → `PlayerInAttackRange = false;`
-- `MonsterController`가 매 `Update`마다 `PlayerInAttackRange`를 읽어 Attack 상태 전환, 플레이어의 체력을 닳게 하는 `TakeDamage` 호출 시도
+- `MonsterController`가 매 `Update`마다 `PlayerInAttackRange`를 읽어 Attack 상태 전환, 플레이어의 체력을 소모 시키는 `TakeDamage` 호출 시도
 
 <br>
 
