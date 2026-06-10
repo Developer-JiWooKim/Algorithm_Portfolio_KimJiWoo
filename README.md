@@ -31,15 +31,13 @@
     - 대각 이동 시 벡터 크기가 √2가 되어 속도가 빨라지는 것을 방지
 - `transform.Translate`로 이동 처리
 
-
-
+<br>
 
 ### Quternion.LookRotation, Quternion.Slerp 부드러운 회전 `PlayerMove.cs` `MonsterMove.cs`
 - `Quternion.LookRotation()` 사용해 방향 벡터를 Quaternion으로 변환
 - `Slerp`로 현재 회전에서 목표 회전까지 부드럽게 보간 처리
-
-        
-
+    
+<br>
 
 ### sqrMagnitude 거리 기반 감지 `MonsterSight.cs`
 ```csharp
