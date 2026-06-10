@@ -31,13 +31,11 @@
     - 대각 이동 시 벡터 크기가 √2가 되어 속도가 빨라지는 것을 방지
 - `transform.Translate`로 이동 처리
 
----
 
 ### Quternion.LookRotation, Quternion.Slerp 부드러운 회전 `PlayerMove.cs` `MonsterMove.cs`
 - `Quternion.LookRotation()` 사용해 방향 벡터를 Quaternion으로 변환
 - `Slerp`로 현재 회전에서 목표 회전까지 부드럽게 보간 처리
 
----
         
 ### sqrMagnitude 거리 기반 감지 `MonsterSight.cs`
 ```csharp
@@ -45,7 +43,6 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
 ```
 - `Vector3.Distance()`는 내부적으로 sqrt를 호출해 연산 비용이 큼 -> sqrt 없이 제곱값끼리 비교하는 sqrMagnitude 사용
 
----
 
 ### 자료구조 활용
 | 자료구조 | 활용 | 
@@ -55,7 +52,6 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
 | `HashSet` | A* 탐색에서 처리 완료 노드 저장 (중복 탐색 방지) |
 | `Stack` | DFS 미로 생성에서 백트래킹 구현 (LIFO 구조) |
 
----
 
 ### 충돌 이벤트(Collider - Trigger 이벤트) `MonterAttack.cs`
 - 몬스터 자식 오브젝트의 `Sphere Collider (Is Trigger = true)`로 공격 범위 구현
@@ -63,7 +59,6 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
 - `OnTriggerExit` :  플레이어 이탈 감지 → `PlayerInAttackRange = false;`
 - `MonsterController`가 매 `Update`마다 `PlayerInAttackRange`를 읽어 Attack 상태 전환, 플레이어의 체력을 닳게 하는 `TakeDamage` 호출 시도
 
----
 
 ### 내적 시야 감지 `MonsterSight.cs`
 - `dirToPlayer.y = 0` 으로 XZ 평면(수평)으로 변환 후 정규화 (`dirToPlayer` : 플레이어 방향 벡터)
@@ -73,7 +68,6 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
     - `fieldOfView`는 양측 전체 시야각, 위 계산으로 나온 `angle`은 forward 기준 편측 각도이므로 절반과 비교
 - 시야각 판별 후 `Physics.Raycast()`로 몬스터→플레이어 방향으로 Ray를 쏴 벽이 가로막고 있으면 감지 실패 처리
 
----
 
 ### DFS 미로 생성 `MazeGenerator.cs`
 - 스택 기반 깊이 우선 탐색으로 완벽한 미로 생성 (모든 셀이 연결됨)
@@ -88,7 +82,6 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
 - seed = -1이면 DateTime.Now.Millisecond로 매번 다른 미로
     - 고정값 입력 시 항상 동일한 미로 재현 가능
 
----
 
 ### A\* 길찾기 `AStarPathfinder.cs`
 - `F = G + H` 공식으로 시작 노드에서 목표 노드까지 최단 경로 탐색
@@ -103,7 +96,6 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
 - 목표 도달 시 `cameFrom`을 역방향으로 따라가 경로 복원 후 `Reverse()`
 - 첫 번째 노드 (현재 몬스터가 있는 셀 중앙) 제거 → 몬스터가 플레이어 추격 중 자신의 셀 중앙으로, 뒤로 이동하는 현상 해결
 
----
 
 ### FSM 상태 전이 `MonsterFSM.cs`
 
@@ -122,7 +114,6 @@ Attack -(공격 범위 이탈)--> Chase
 | `Chase` | 플레이어 감지 시 추격 시작. 직선 경로에 벽이 없으면 직선 이동, 있으면 A* 경로로 이동. 탐지 거리 이탈 시 Idle로 전환 |
 | `Attack` | 공격 범위 진입 시 즉시 1 데미지. 3초 후에도 범위 안에 있으면 반복 데미지. 범위 이탈 시 Chase로 복귀 |
 
----
 
 ### SpereCast 최적화 `MonsterMove.cs`
 - `Physics.SphereCast`로 몬스터와 플레이어 사이에 벽 존재 여부를 먼저 확인
