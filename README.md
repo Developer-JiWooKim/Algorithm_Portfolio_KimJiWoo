@@ -87,7 +87,7 @@ Update()               → FSM 상태 전환 및 TryAttack() 처리
 
 <br>
 
-### DFS 미로 생성 `MazeGenerator.cs`
+### DFS 기반 미로 생성 `MazeGenerator.cs`
 - 스택 기반 깊이 우선 탐색으로 완벽한 미로 생성 (모든 셀이 연결됨)
 
 ```
