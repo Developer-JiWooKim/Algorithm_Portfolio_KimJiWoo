@@ -6,13 +6,22 @@ public class MonsterSight : MonoBehaviour
     [SerializeField] private float fieldOfView    = 90f;   // 전체 시야각
     [SerializeField] private bool  isSense        = false; // 감지 여부
 
+    private int _wallLayerMask;
+
+    private void Awake()
+    {
+        _wallLayerMask = LayerMask.GetMask("Wall");
+    }
+
     /// <summary>
     /// 타겟이 시야각 안에 들어와 있고 타겟과 자신 사이에 벽이 있는지 검사하는 메소드 
     /// </summary>
     public bool TargetSense(Vector3 targetPos)
     {
         // 방향 벡터 계산 후 정규화(xy 평면만)
-        Vector3 dirToPlayer = targetPos - transform.position; 
+
+        Vector3 myPos = transform.position;
+        Vector3 dirToPlayer = targetPos - myPos; 
         dirToPlayer.y = 0;  
         dirToPlayer = dirToPlayer.normalized; 
 
@@ -30,13 +39,13 @@ public class MonsterSight : MonoBehaviour
         }
 
         // 내 위치 기준 바닥에서 0.5f 위 지점
-        Vector3 origin = transform.position + Vector3.up * 0.5f;
+        Vector3 origin = myPos + Vector3.up * 0.5f;
 
         // 타겟과 자신 사이의 거리
-        float distance = Vector3.Distance(transform.position, targetPos);
+        float distance = Vector3.Distance(myPos, targetPos);
         
         // 시야각 안에 있어도 Ray를 쐈을 때 벽이 타겟과 자신 사이에 있으면 감지 실패
-        if(Physics.Raycast(origin, dirToPlayer, distance, LayerMask.GetMask("Wall")))
+        if(Physics.Raycast(origin, dirToPlayer, distance, _wallLayerMask))
         {
             return isSense = false;
         }

@@ -35,7 +35,7 @@ public class MonsterMove : MonoBehaviour
 
         Vector2Int goalCell = AStarPathfinder.Instance.WorldToCell(targetPos);
 
-        if (goalCell == _lastGoalCell && _path != null) return;
+        if (goalCell == _lastGoalCell && _path.Count > 0) return;
 
         _lastGoalCell = goalCell;
 
@@ -53,7 +53,7 @@ public class MonsterMove : MonoBehaviour
     /// </summary>
     public void ClearPath()
     {
-        _path = null;
+        _path.Clear();
         _pathIndex = 0;
     }
 
@@ -73,17 +73,18 @@ public class MonsterMove : MonoBehaviour
             RequestPath(targetPos);
 
             // 길이 없거나 끝에 도달했으면 타겟 방향으로 직진
-            if (_path == null || _pathIndex >= _path.Count)
+            if (_path.Count == 0 || _pathIndex >= _path.Count)
             {
                 MoveStraight(targetPos);
                 return;
             }
 
+            Vector3 myPos = transform.position;
             Vector3 nodePos = _path[_pathIndex];
-            nodePos.y = transform.position.y;
+            nodePos.y = myPos.y;
 
             // 목표 노드에 도착 시 다음 노드로 목표 노드를 바꿈
-            if ((nodePos - transform.position).sqrMagnitude < nodeDistance * nodeDistance)
+            if ((nodePos - myPos).sqrMagnitude < nodeDistance * nodeDistance)
             {
                 _pathIndex++;
                 return;
@@ -104,7 +105,7 @@ public class MonsterMove : MonoBehaviour
 
         if (dir.sqrMagnitude < 0.001f) return;
 
-        RotateToward(dir.normalized);
+        RotateToward(dir);
     }
 
     /// <summary>
@@ -134,11 +135,9 @@ public class MonsterMove : MonoBehaviour
 
         if (dir.sqrMagnitude < 0.001f) return;
 
-        dir = dir.normalized;
-
         RotateToward(dir);
 
-        transform.Translate(dir * moveSpeed * Time.deltaTime, Space.World);
+        transform.Translate(dir.normalized * moveSpeed * Time.deltaTime, Space.World);
     }
 
     /// <summary>
