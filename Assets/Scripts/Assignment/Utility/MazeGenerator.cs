@@ -23,6 +23,9 @@ public class MazeGenerator : MonoBehaviour
     private List<GameObject> _wallObjects = new List<GameObject>();
     private List<Cell>       _allCells    = new List<Cell>();
 
+    private readonly List<Cell>  _neighborCache = new List<Cell>(4);
+    private readonly Stack<Cell> _dfsStack      = new Stack<Cell>();
+
     public IReadOnlyList<Cell> AllCells => _allCells;
     public int Cols  => _cols;
     public int Rows  => _rows;
@@ -90,15 +93,15 @@ public class MazeGenerator : MonoBehaviour
             Random.InitState(seed);
         }
 
-        Stack<Cell> stack = new Stack<Cell>();
+        _dfsStack.Clear();
 
         Cell startCell = _grid[Random.Range(0, _cols), Random.Range(0, _rows)];
         startCell.visited = true;
-        stack.Push(startCell);
+        _dfsStack.Push(startCell);
 
-        while (stack.Count > 0)
+        while (_dfsStack.Count > 0)
         {
-            Cell current = stack.Peek();
+            Cell current = _dfsStack.Peek();
             List<Cell> neighbors = GetUnvisitedNeighbors(current);
 
             if (neighbors.Count > 0)
@@ -109,12 +112,12 @@ public class MazeGenerator : MonoBehaviour
                 RemoveWallBetween(current, next);
 
                 next.visited = true;
-                stack.Push(next);
+                _dfsStack.Push(next);
             }
             else
             {
                 // 막힌 곳 
-                stack.Pop();
+                _dfsStack.Pop();
             }
         }
     }
@@ -124,16 +127,17 @@ public class MazeGenerator : MonoBehaviour
     /// </summary>
     private List<Cell> GetUnvisitedNeighbors(Cell cell)
     {
-        var list = new List<Cell>(4);
+        _neighborCache.Clear();
+
         int c = cell.col;
         int r = cell.row;
 
-        if (r + 1 < _rows && !_grid[c, r + 1].visited) list.Add(_grid[c, r + 1]); // north
-        if (r - 1 >= 0    && !_grid[c, r - 1].visited) list.Add(_grid[c, r - 1]); // south
-        if (c + 1 < _cols && !_grid[c + 1, r].visited) list.Add(_grid[c + 1, r]); // east
-        if (c - 1 >= 0    && !_grid[c - 1, r].visited) list.Add(_grid[c - 1, r]); // west
+        if (r + 1 < _rows && !_grid[c, r + 1].visited) _neighborCache.Add(_grid[c, r + 1]); // north
+        if (r - 1 >= 0    && !_grid[c, r - 1].visited) _neighborCache.Add(_grid[c, r - 1]); // south
+        if (c + 1 < _cols && !_grid[c + 1, r].visited) _neighborCache.Add(_grid[c + 1, r]); // east
+        if (c - 1 >= 0    && !_grid[c - 1, r].visited) _neighborCache.Add(_grid[c - 1, r]); // west
 
-        return list;
+        return _neighborCache;
     }
 
     /// <summary>

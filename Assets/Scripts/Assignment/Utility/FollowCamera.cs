@@ -7,10 +7,9 @@ public class FollowCamera : MonoBehaviour
 {
     [SerializeField] private Transform target;
     [SerializeField] private Vector3   cameraOffset;
+    [SerializeField] private float     smoothTime = 0.3f; // 높을수록 더 느리게 따라감
 
-    private Vector3 _velocity = Vector3.zero;
-
-    public float smoothTime  = 0.3f; // 높을수록 더 느리게 따라감
+    private Vector3 _velocity = Vector3.zero;    
 
     private void LateUpdate()
     {

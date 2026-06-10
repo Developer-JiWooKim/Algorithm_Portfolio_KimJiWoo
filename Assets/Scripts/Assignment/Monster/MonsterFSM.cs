@@ -14,7 +14,7 @@ public class MonsterFSM : MonoBehaviour
 
     public State Current => current;
 
-    public event Action<State, State> OnStateChanged;
+    public event Action<State> OnStateChanged;
 
     /// <summary>
     /// isSensed(시야각, 장애물 있는지 여부), isInRange(감지 범위 안에 들어와있는지 여부) 에 따라 현재 상태 결정하는 메소드
@@ -57,9 +57,8 @@ public class MonsterFSM : MonoBehaviour
     {
         if (current == next) return;
 
-        State prev = current;
-        current = next;
+        OnStateChanged?.Invoke(next);
 
-        OnStateChanged?.Invoke(prev, next);
+        current = next;
     }
 }

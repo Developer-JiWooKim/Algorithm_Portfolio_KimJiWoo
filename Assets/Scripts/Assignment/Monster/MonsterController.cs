@@ -46,7 +46,7 @@ public class MonsterController : MonoBehaviour
     /// <summary>
     /// 상태가 변경되면 실행할 이벤트에 등록된 메소드
     /// </summary>
-    private void OnStateChanged(MonsterFSM.State prev, MonsterFSM.State next)
+    private void OnStateChanged(MonsterFSM.State next)
     {
         switch (next)
         {

@@ -7,10 +7,16 @@ public class MonsterMove : MonoBehaviour
     [SerializeField] private float rotateSpeed  = 15f;  // 회전 속도
     [SerializeField] private float nodeDistance = 0.5f;
 
-    private List<Vector3> _path;
+    private List<Vector3> _path             = new List<Vector3>();
     private int           _pathIndex;
-    private Vector2Int    _lastGoalCell = Vector2Int.zero;
+    private Vector2Int    _lastGoalCell     = Vector2Int.zero;
     private float         _sphereCastRaduis = 0.5f; // SphereCast 구체 Radius
+    private int           _wallLayerMask;
+
+    private void Awake()
+    {
+        _wallLayerMask = LayerMask.GetMask("Wall");
+    }
 
     /// <summary>
     /// Idle 상태일 때 제자리 회전
@@ -106,12 +112,16 @@ public class MonsterMove : MonoBehaviour
     /// </summary>
     private bool IsPathClear(Vector3 targetPos)
     {
-        Vector3 origin = transform.position + Vector3.up * 0.5f;
-        Vector3 direction = (targetPos - transform.position);
+        Vector3 myPos = transform.position;
+
+        Vector3 origin = myPos + Vector3.up * 0.5f;
+
+        Vector3 direction = (targetPos - myPos);
         direction.y = 0;
+
         float distance = direction.magnitude;
 
-        return !Physics.SphereCast(origin, _sphereCastRaduis, direction.normalized, out _, distance, LayerMask.GetMask("Wall"));
+        return !Physics.SphereCast(origin, _sphereCastRaduis, direction.normalized, out _, distance, _wallLayerMask);
     }
 
     /// <summary>

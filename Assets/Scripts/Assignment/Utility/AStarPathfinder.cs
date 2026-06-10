@@ -1,9 +1,17 @@
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 public class AStarPathfinder : MonoBehaviour
 {
     [SerializeField] private MazeGenerator mazeGenerator;
+
+    private readonly List<Vector2Int>                   _openSet        = new List<Vector2Int>();
+    private readonly HashSet<Vector2Int>                _closedSet      = new HashSet<Vector2Int>();
+    private readonly Dictionary<Vector2Int, Vector2Int> _cameFrom       = new Dictionary<Vector2Int, Vector2Int>();
+    private readonly Dictionary<Vector2Int, int>        _gCost          = new Dictionary<Vector2Int, int>();
+    private readonly List<Vector2Int>                   _cachedPath     = new List<Vector2Int>();
+    private readonly List<Vector2Int>                   _neighborResult = new List<Vector2Int>(4);
 
     private int _cost = 10; // 한 셀 이동 비용
 
@@ -42,43 +50,45 @@ public class AStarPathfinder : MonoBehaviour
         // 시작 지점과 목표 지점이 같으면 null
         if (start == goal) return null;
 
-        var openSet   = new List<Vector2Int>();
-        var closedSet = new HashSet<Vector2Int>();
-        var cameFrom  = new Dictionary<Vector2Int, Vector2Int>();
-        var gCost     = new Dictionary<Vector2Int, int>();
+        // 초기화
+        _openSet.Clear();
+        _closedSet.Clear();
+        _cameFrom.Clear();
+        _gCost.Clear();
 
-        openSet.Add(start);
-        gCost[start] = 0;
+        _openSet.Add(start);
+        _gCost[start] = 0;
 
-        while (openSet.Count > 0)
+        while (_openSet.Count > 0)
         {
             // F(G + H)가 가장 적은 셀(goal)을 찾음
-            Vector2Int current = GetLowestF(openSet, gCost, goal);
+            Vector2Int current = GetLowestF(_openSet, _gCost, goal);
 
             // 현재 위치가 목표지점과 같으면 cameFrom으로 최종 경로를 만들고 탐색 종료
             if(current == goal)
             {
-                return BuildPath(cameFrom, current);
+                return BuildPath(_cameFrom, current);
             }
 
             // 현재 위치는 검사 했으니 제거, 방문 표시 남김
-            openSet.Remove(current);
-            closedSet.Add(current);
+            _openSet.Remove(current);
+            _closedSet.Add(current);
 
             foreach (var neighbor in GetNeighbors(current))
             {
-                if (closedSet.Contains(neighbor)) continue;
+                if (_closedSet.Contains(neighbor)) continue;
 
                 // 셀 이동 비용 책정
-                int newGCost = gCost[current] + _cost;
+                int newGCost = _gCost[current] + _cost;
 
-                if (!gCost.ContainsKey(neighbor) || newGCost < gCost[neighbor])
+                if (!_gCost.ContainsKey(neighbor) || newGCost < _gCost[neighbor])
                 {
-                    cameFrom[neighbor] = current;
-                    gCost[neighbor] = newGCost;
-                    if(!openSet.Contains(neighbor))
+                    _cameFrom[neighbor] = current;
+                    _gCost[neighbor] = newGCost;
+
+                    if(!_openSet.Contains(neighbor))
                     {
-                        openSet.Add(neighbor);
+                        _openSet.Add(neighbor);
                     }
                 }
             }            
@@ -92,29 +102,29 @@ public class AStarPathfinder : MonoBehaviour
     /// </summary>
     private List<Vector3> BuildPath(Dictionary<Vector2Int, Vector2Int> cameFrom, Vector2Int current)
     {
-        List<Vector2Int> path = new List<Vector2Int>();
-        path.Add(current);
+        _cachedPath.Clear();
+        _cachedPath.Add(current);
 
         // 목표 -> 시작 순서로 역추적하며 path에 저장
         while (cameFrom.ContainsKey(current))
         {
             current = cameFrom[current];
-            path.Add(current);
+            _cachedPath.Add(current);
         }
 
         // 시작 -> 목표 순서로 path 반전
-        path.Reverse();
+        _cachedPath.Reverse();
 
         // 첫 번째 노드 제거, 몬스터가 이동 중 자신의 셀 중앙으로 가기 위해 뒤로 이동하는 현상 방어
-        if(path.Count > 1)
+        if(_cachedPath.Count > 1)
         {
-            path.RemoveAt(0);
+            _cachedPath.RemoveAt(0);
         }
 
         List<Vector3> worldPath = new List<Vector3>();
 
         // 셀 인덱스를 월드 좌표로 변환
-        foreach (Vector2Int node in path)
+        foreach (Vector2Int node in _cachedPath)
         {
             worldPath.Add(mazeGenerator.CellToWorld(node));
         }           
@@ -126,23 +136,22 @@ public class AStarPathfinder : MonoBehaviour
     /// 현재 셀에서 이동 가능한 이웃 셀 반환하는 메소드
     /// </summary>
     private List<Vector2Int> GetNeighbors(Vector2Int node)
-    {
-        // 4방향(한 셀에 존재하는 4방향의 벽 기반으로 이동 가능한 셀 구함
-        var result = new List<Vector2Int>(4);
+    {        
+        _neighborResult.Clear();
 
         Cell cell = mazeGenerator.GetCell(node.x, node.y);
 
-        if (cell == null) return result;
+        if (cell == null) return _neighborResult;
 
+        // 4방향(한 셀에 존재하는 4방향의 벽 기반)으로 이동 가능한 셀 구함
         // true면 벽 있음 - 이동 불가
         // false면 벽 없음 - 이동 가능
-        if (!cell.northWall) result.Add(new Vector2Int(node.x,     node.y + 1));
-        if (!cell.southWall) result.Add(new Vector2Int(node.x,     node.y - 1));
-        if (!cell.eastWall ) result.Add(new Vector2Int(node.x + 1, node.y));
-        if (!cell.westWall)  result.Add(new Vector2Int(node.x - 1, node.y));
+        if (!cell.northWall) _neighborResult.Add(new Vector2Int(node.x,     node.y + 1));
+        if (!cell.southWall) _neighborResult.Add(new Vector2Int(node.x,     node.y - 1));
+        if (!cell.eastWall ) _neighborResult.Add(new Vector2Int(node.x + 1, node.y));
+        if (!cell.westWall)  _neighborResult.Add(new Vector2Int(node.x - 1, node.y));
 
-        return result;
-
+        return _neighborResult;
     }
 
     /// <summary>
