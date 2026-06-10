@@ -110,10 +110,10 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
 ```
 Idle -(플레이어 감지)-> Chase
 
-Chase -(플레이어가 공격 범위 안에 진입)-> Attack
-Chase -(감지 거리 이탈)-> Idle
+Chase --(플레이어가 공격 범위 안에 진입)--> Attack
+Chase --(감지 거리 이탈)--> Idle
 
-Attack -(공격 범위 이탈)-> Chase
+Attack -(공격 범위 이탈)--> Chase
 ```
 
 | 상태 | 동작 |
@@ -133,31 +133,28 @@ Attack -(공격 범위 이탈)-> Chase
 
 ## 자료구조 선택 이유
 
-    List
-        List<Vector3> _path (MonsterMove.cs)
-            - A* 경로 노드를 순서대로 저장하고 인덱스(_pathIndex)로 순차 접근 위해
-            - 경로는 시작 -> 목표 순서가 중요하므로 인덱스 기반 접근(_pathIndex++)에 유리한 List 사용
+### List
+| 변수 | 위치 | 선택 이유 |
+|---|---|---|
+| `List<Vector3> _path` | `MonsterMove.cs` | A\* 경로 노드를 순서대로 저장, `_pathIndex++`로 순차 접근하므로 인덱스 기반 접근에 유리한 List 사용 |
+| `List<Cell> candidates` | `MonsterSpawner.cs` | 스폰 가능한 셀 필터링 후 저장, Fisher-Yates 셔플에서 인덱스 기반 교환이 필요하므로 List 사용 |
 
-        List<Cell> candidates (MonsterSpawner.cs)
-            - 스폰 가능한 셀 전체를 순회하며 조건 필터링 후 저장
-            - Fisher-Yates 셔플에서 인덱스 기반 교환이 필요하므로 List 사용
+### Dictionary
 
-    Dictionary
-        Dictionary<Vector2Int, Vector2Int> cameFrom (AStarPathfinder.cs)
-            - 각 노드의 부모 노드를 기록해 경로 역추적에 사용
-            - 셀 좌표(Vector2Int)를 key로 접근이 필요하므로 Dictionary 사용
-        
-        Dictionary<Vector2Int, int> gCost (AStarPathfinder.cs)
-            - 각 노드까지의 이동 비용(g값)을 저장
-            - 이웃 노드 탐색 시 기존 비용과 새 비용 비교과 비번하게 일어나므로 key로 접근이 가능한 Dictionary 사용
+| 변수 | 위치 | 선택 이유 |
+|---|---|---|
+| `Dictionary<Vector2Int, Vector2Int> cameFrom` | `AStarPathfinder.cs` | 각 노드의 부모 노드를 기록해 경로 역추적에 사용. 셀 좌표를 key로 빠른 접근이 필요하므로 Dictionary 사용 |
+| `Dictionary<Vector2Int, int> gCost` | `AStarPathfinder.cs` | 각 노드까지의 이동 비용(g값) 저장. 이웃 노드 탐색 시 기존 비용과 새 비용 비교가 빈번하므로 key로 접근 가능한 Dictionary 사용 |
             
-    HashSet
-        HashSet<Vector2Int> closedSet (AStarPathfinder.cs)
-            - 이미 처리한 노드를 저장, 중복 탐색 방지
-            - A* 탐색 중 매 이웃 노드마다 포함 여부를 확인, Contains로 검색 가능한 HashSet 사용(Hash 함수를 사용하는 HashSet이 List 보다 성능 좋음)
+### HashSet
 
-    Stack
-        Stack<Cell> stack (MazeGenerator.cs)
-           - DFS 백트래킹 구현에 사용
-           - 막힌 셀에서 되돌아갈 때 가장 최근에 방문한 셀로 돌아가야 하므로 LIFO(후입선출) 구조인 Stack이 적합
+| 변수 | 위치 | 선택 이유 |
+|---|---|---|
+| `HashSet<Vector2Int> closedSet` | `AStarPathfinder.cs` | 처리 완료 노드 저장, 중복 탐색 방지. 매 이웃 노드마다 포함 여부를 확인하므로 해시 함수 기반으로 `O(1)` 검색이 가능한 HashSet 사용 (List의 `Contains`는 `O(n)`) |
+
+### Stack
+
+| 변수 | 위치 | 선택 이유 |
+|---|---|---|
+| `Stack<Cell> stack` | `MazeGenerator.cs` | DFS 백트래킹 구현. 막힌 셀에서 가장 최근에 방문한 셀로 돌아가야 하므로 LIFO(후입선출) 구조인 Stack이 적합 |
         
