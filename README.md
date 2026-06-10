@@ -1,7 +1,8 @@
-<h1>게임 알고리즘 포트폴리오 과제</h1>
-<h2>유니티 버전: 6.4.9f1</h2>
+# 게임 알고리즘 포트폴리오 과제
 
-<h3>게임 플레이 방법</h3>
+**유니티 버전:** 6.4.9f1
+
+게임 플레이 방법
     - 에디터 플레이 버튼 클릭하면 게임 시작 
     - 키보드 조작(방향키 or wasd)으로 플레이어 캐릭터를 이동 시켜 오른쪽 맨 위(Goal Point)에 도달하면 게임 클리어
     - 게임 시작 시 무작위 맵 생성 후 무작위 위치에 몬스터들이 스폰, 몬스터들의 시야각 안에(벽뒤 제외) 들어가면 플레이어 캐릭터를 추격함
@@ -22,14 +23,15 @@
     - Input System + Transform 기반 플레이어 이동 (PlayerMove.cs)
         - UnityEngine.InputSystem의 Keyboard.current로 키 입력 감지
         - 입력값을 Vector3로 변환 후 .normalized로 정규화
-        - transform.Translate로 이동, Quaternion.LookRotation으로 이동 방향 즉시 회전
+        - transform.Translate로 이동 처리
 
     - Quternion.LookRotation, Quternion.Slerp 부드러운 회전(PlayerMove.cs, MonsterMove.cs)
         - LookRotation: 방향 벡터를 Quaternion으로 변환
-        - Slerp(구면 선형 보간): 현재 회전에서 목표 회전까지 부드럽게 보간
+        - Slerp로 현재 회전에서 목표 회전까지 부드럽게 보간 처리
         
     - sqrMagnitude를 사용한 거리 기반 감지(MonsterSight.cs)
-        - TODO# 이 부분 찾아서 사용한 공식 넣기
+        - dir.sqrMagnitude <= detectionRange * detectionRange;(dir:타겟 방향 벡터 / detectionRange:감지 범위)
+        - Vector3.Distance()는 내부적으로 sqrt를 호출해 연산 비용이 크기에 sqrt 없이 제곱값끼리 비교하는 sqrMagnitude 사용
 
     - 자료구조 활용
         - List: 경로 노드, 스폰 후보 셀, 몬스터 목록 관리
@@ -41,17 +43,14 @@
         - 몬스터 자식 오브젝트의 Sphere Collider (Is Trigger = true)로 공격 범위 구현
         - OnTriggerEnter: 플레이어 진입 감지 → PlayerInAttackRange = true
         - OnTriggerExit:  플레이어 이탈 감지 → PlayerInAttackRange = false
-        - MonsterController가 매 Update마다 PlayerInAttackRange를 읽어 Attack 상태 전환
+        - MonsterController가 매 Update마다 PlayerInAttackRange를 읽어 Attack 상태 전환, 플레이어의 체력을 닳게 하는 TakeDamage 호출 시도
 
     - 내적 시야 감지 (MonsterSight.cs)
-        - dirToPlayer.y = 0으로 XZ 평면(수평)으로 변환 후 정규화
+        - dirToPlayer.y = 0으로 XZ 평면(수평)으로 변환 후 정규화 (dirToPlayer: 플레이어 방향 벡터)
         - Vector3.Dot으로 몬스터 forward와 플레이어 방향의 사잇각 코사인 값 계산
-        - Mathf.Clamp(dot, -1, 1): 부동소수점 오차로 dot이 범위를 벗어나면 Mathf.Acos가 NaN을 반환하므로 반드시 Clamp로 방어
-        - Mathf.Acos(dot) * Mathf.Rad2Deg로 각도 변환 후 fieldOfView * 0.5f와 비교
-          (fieldOfView는 양측 전체 시야각, angle은 forward 기준 편측 각도이므로 절반과 비교)
+        - Mathf.Clamp(dot, -1, 1): 부동소수점 오차로 dot이 범위를 벗어나면 Mathf.Acos가 NaN을 반환하므로 반드시 Clamp로 방어 처리
+        - Mathf.Acos(dot) * Mathf.Rad2Deg로 각도 변환 후 fieldOfView * 0.5f와 비교 (fieldOfView는 양측 전체 시야각, angle은 forward 기준 편측 각도이므로 절반과 비교)
         - 시야각 판별 후 Physics.Raycast로 몬스터→플레이어 방향으로 Ray를 쏴 벽이 가로막고 있으면 감지 실패 처리
-        - Vector3.Dot으로 몬스터 forward와 플레이어 방향의 사잇각 코사인 값 계산, Mathf.Acos(dot) * Mathf.Rad2Deg로 코사인 값을 각도록 변환 후 시야각 내에 플레이어가 있는지 판별
-        - 시야각 판별 후 Physics.Raycast로 벽 뒤 감지를 차단
 
     - DFS 미로 생성 (MazeGenerator.cs)
         - 스택 기반 깊이 우선 탐색으로 완벽한 미로 생성 (모든 셀이 연결됨)
@@ -59,23 +58,31 @@
         - 선택한 이웃 셀과의 공유 벽을 양쪽 모두 제거 후 스택에 push
         - 미방문 이웃이 없으면 스택에서 pop (백트래킹)
         - 스택이 빌 때까지 반복 → 모든 셀 방문 완료
-        - seed = -1이면 DateTime.Now.Millisecond로 매번 다른 미로,
-          고정값 입력 시 항상 동일한 미로 재현 가능
-        - 스택 기반 깊이 우선 탐색으로 미로를 생성
-        - 시작 셀에서 랜덤한 미방문 이웃을 선택해 벽을 제거하며 이동하고 막히면 스택에서 꺼내 백 트래킹 -> 모든 셀이 방문될 때까지 반복하여 모든 셀이 연결된 미로를 생성함
+        - seed = -1이면 DateTime.Now.Millisecond로 매번 다른 미로, 고정값 입력 시 항상 동일한 미로 재현 가능
 
     - A* 길찾기 (AStarPathfinder.cs)
-        - 시작 노드에서 목표노드까지의 최단 거리를 구함(셀의 벽 정보로 판단해 벽이 없는 방향으로만 이동)
-            g - 시작에서 현재 노드까지 실제 비용
-            h - 맨해튼 거리 휴리스틱
+        - F = G + H 공식으로 시작 노드에서 목표 노드까지 최단 경로 탐색
+            g: 시작에서 현재 노드까지 실제 이동 비용 (한 칸 = 10)
+            h: 맨해튼 거리 휴리스틱 (|dx| + |dy|) * 10
+        - 노드: 미로의 각 Cell (col, row 좌표)
+        - 간선: Cell의 벽 정보(Cell 클래스 내부에 bool형으로 정의)로 판단, 벽이 없는 방향만 이웃으로 추가
+        - 목표 도달 시 cameFrom을 역방향으로 따라가 경로 복원 후 Reverse
+        - 첫 번째 노드(몬스터 현재 셀 중앙) 제거 → 몬스터가 플레이어 추격 중 자신의 셀 중앙으로, 뒤로 이동하는 현상 해결
 
     - FSM 상태 전이 (MonsterFSM.cs)
         Idle   - 제자리에서 회전하며 시야각 내에 플레이어가 들어오는지 검사
-        Chase  - 플레이어가 감지되면 추격 시작(플레이어에게 곧바로 이동, 중간에 벽이 있으면 A*알고리즘으로 계산한 경로로 이동)
-        Attack - 공격 범위 안에 플레이어가 들어오면 플레이어에게 데미지를 입히고 AttackInterval(3초)이 지나도 공격 범위 안에 플레이어가 있으면 또 다시 데미지를 입힘, Trigger 이벤트
 
-    - SpereCast(MonsterMove.cs)
-        몬스터와 플레이어 사이에 Physics.SphereCast로 벽 존재 여부를 확인 -> 벽이 없으면 직선 이동, 있으면 A* 경로를 요청
+        Chase  - 플레이어 감지 시 추격 시작
+                 SphereCast로 직선 경로 확인 후 벽이 없으면 직선 이동 벽이 있으면 A* 경로로 이동
+                 탐지 거리를 벗어나면 다시 Idle로 전환
+
+        Attack - 공격 범위(Sphere Collider Trigger) 안에 플레이어 진입 시 즉시 1 데미지
+                 3초(AttackInterval) 후에도 범위 안에 있으면 반복 데미지
+                 범위 이탈 시 Chase로 복귀
+
+    - SpereCast 최적화 (MonsterMove.cs)
+        - SphereCast: radius만큼의 구체를 굴려 체크 → 몬스터가 실제로 이동 가능한지 더 정확하게 판단(타겟과 자신 사이에 벽(Layer:Wall)이 있으면 이동 불가 판단
+        - 직선 경로가 열려있으면 A* 계산을 생략해 성능 최적화 -> 몬스터 수가 많아질수록 효과가 큼
 
 
 
