@@ -30,6 +30,7 @@
 - 입력 값을 `Vector3`로 변환 후 `.normalized`로 정규화
     - 대각 이동 시 벡터 크기가 √2가 되어 속도가 빨라지는 것을 방지
 - `transform.Translate`로 이동 처리
+    - `Rigidbody` 없이 `transform.Translate`로 직접 처리하므로 `Update`에서 `Time.deltaTime` 사용
 
 <br>
 
@@ -43,7 +44,26 @@
 ```csharp
 dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡터 / detectionRange : 감지 범위
 ```
-- `Vector3.Distance()`는 내부적으로 sqrt를 호출해 연산 비용이 큼 -> sqrt 없이 제곱값끼리 비교하는 sqrMagnitude 사용
+- `Vector3.Distance()`는 내부적으로 sqrt를 호출해 연산 비용이 큼 → sqrt 없이 제곱값끼리 비교하는 sqrMagnitude 사용
+
+<br>
+
+### 충돌 이벤트(Collider - Trigger 이벤트) `MonterAttack.cs`
+- 몬스터 자식 오브젝트의 `Sphere Collider (Is Trigger = true)`로 공격 범위 구현
+
+Unity 6의 물리 실행 순서
+```
+FixedUpdate()          → 감지(TargetSense) 처리
+    ↓
+Physics Step           → 충돌 감지 (Broadphase → Narrowphase)
+    ↓
+OnTriggerEnter/Exit()  → 공격 범위 진입/이탈 이벤트 호출
+    ↓
+Update()               → FSM 상태 전환 및 TryAttack() 처리
+```
+- `OnTriggerEnter` : 플레이어 공격 범위 진입 감지 → `PlayerInAttackRange = true;`
+- `OnTriggerExit`  : 플레이어 공격 범위 이탈 감지 → `PlayerInAttackRange = false;`
+- `MonsterController`가 매 `Update`마다 `PlayerInAttackRange`를 읽어 Attack 상태 전환, 플레이어의 체력을 닳게 하는 `TakeDamage` 호출 시도
 
 <br>
 
@@ -54,14 +74,6 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
 | `Dictionary` | A* 탐색에서 g비용, 경로 역추적 부모 노드 저장 |
 | `HashSet` | A* 탐색에서 처리 완료 노드 저장 (중복 탐색 방지) |
 | `Stack` | DFS 미로 생성에서 백트래킹 구현 (LIFO 구조) |
-
-<br>
-
-### 충돌 이벤트(Collider - Trigger 이벤트) `MonterAttack.cs`
-- 몬스터 자식 오브젝트의 `Sphere Collider (Is Trigger = true)`로 공격 범위 구현
-- `OnTriggerEnter` : 플레이어 진입 감지 → `PlayerInAttackRange = true;`
-- `OnTriggerExit` :  플레이어 이탈 감지 → `PlayerInAttackRange = false;`
-- `MonsterController`가 매 `Update`마다 `PlayerInAttackRange`를 읽어 Attack 상태 전환, 플레이어의 체력을 닳게 하는 `TakeDamage` 호출 시도
 
 <br>
 
