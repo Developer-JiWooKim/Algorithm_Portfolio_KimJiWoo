@@ -108,12 +108,12 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
 ### FSM 상태 전이 `MonsterFSM.cs`
 
 ```
-Idle -(플레이어 감지)-> Chase
+Idle --(플레이어 감지)--> Chase
 
 Chase --(플레이어가 공격 범위 안에 진입)--> Attack
 Chase --(감지 거리 이탈)--> Idle
 
-Attack -(공격 범위 이탈)--> Chase
+Attack --(공격 범위 이탈)--> Chase
 ```
 
 | 상태 | 동작 |
