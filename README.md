@@ -48,10 +48,12 @@ dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡�
 ---
 
 ### 자료구조 활용
-| `List` || 경로 노드, 스폰 후보 셀, 몬스터 목록 관리 |
-| `Dictionary` ||A* 탐색에서 g비용, 경로 역추적 부모 노드 저장 |
-| `HashSet` || A* 탐색에서 처리 완료 노드 저장 (중복 탐색 방지) |
-| `Stack` || DFS 미로 생성에서 백트래킹 구현 (LIFO 구조) |
+| 자료구조 | 활용 | 
+| --- | --- |
+| `List` | 경로 노드, 스폰 후보 셀, 몬스터 목록 관리 |
+| `Dictionary` |A* 탐색에서 g비용, 경로 역추적 부모 노드 저장 |
+| `HashSet` | A* 탐색에서 처리 완료 노드 저장 (중복 탐색 방지) |
+| `Stack` | DFS 미로 생성에서 백트래킹 구현 (LIFO 구조) |
 
 ---
 
