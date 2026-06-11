@@ -6,15 +6,15 @@ public class MazeGenerator : MonoBehaviour
     [Header("Gird")]
     [SerializeField] private int    _cols = 10; // 가로
     [SerializeField] private int    _rows = 10; // 세로
-    [SerializeField] private float  _cellSize = 5f;
-
-    [Header("시작 점")]
-    [SerializeField] private Vector2 worldStart = new Vector2(-25f, -25f);
+    [SerializeField] private float  _cellSize = 5f;    
 
     [Header("Walls")]
     [SerializeField] private GameObject wallPrefab;
     [SerializeField] private float      wallThickness = 0.3f;
     [SerializeField] private float      wallHeight    = 3f;
+
+    [Header("Goal Point")]
+    [SerializeField] private GameObject goalPointPrefab;
 
     [Header("Random Seed")]
     [SerializeField] private int seed = -1;    
@@ -22,6 +22,8 @@ public class MazeGenerator : MonoBehaviour
     private Cell[,]          _grid;    
     private List<GameObject> _wallObjects = new List<GameObject>();
     private List<Cell>       _allCells    = new List<Cell>();
+
+    private Vector2 worldStart;
 
     private readonly List<Cell>  _neighborCache = new List<Cell>(4);
     private readonly Stack<Cell> _dfsStack      = new Stack<Cell>();
@@ -31,7 +33,16 @@ public class MazeGenerator : MonoBehaviour
     public int Rows  => _rows;
     public float CellSize => _cellSize;
 
-    private void Awake() => Generate();
+    // private void Awake() => Generate();
+
+    public void SetSize(int cols, int rows)
+    {
+        _cols = cols;
+        _rows = rows;
+
+        worldStart = new Vector2(-cols * _cellSize * 0.5f, -rows * _cellSize * 0.5f);
+        Debug.Log(worldStart);
+    }
 
     /// <summary>
     /// 미로 생성 메소드
@@ -42,6 +53,19 @@ public class MazeGenerator : MonoBehaviour
         InitGrid();
         RunDFS();
         SpawnWalls();
+        SpawnGoalPoint();
+    }
+
+    private void SpawnGoalPoint()
+    {
+        if (goalPointPrefab == null) return;
+
+        Cell goalCell = _grid[_cols - 1, _rows - 1];
+
+        Vector3 spawnPos = goalCell.worldCenter;
+        spawnPos.y = 1f;
+
+        Instantiate(goalPointPrefab, spawnPos, Quaternion.identity);
     }
 
     /// <summary>

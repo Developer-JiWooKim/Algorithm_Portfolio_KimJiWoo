@@ -5,10 +5,11 @@ using UnityEngine;
 /// </summary>
 public class MonsterController : MonoBehaviour
 {
-    private MonsterSight  _monsterSight;
-    private MonsterMove   _monsterMove;
-    private MonsterFSM    _monsterFSM;
-    private MonsterAttack _monsterAttack;
+    private MonsterSight       _monsterSight;
+    private MonsterMove        _monsterMove;
+    private MonsterFSM         _monsterFSM;
+    private MonsterAttack      _monsterAttack;
+    private MonsterFieldOfView _monsterFOV;
 
     private bool _isSensed  = false; // 타겟 감지 여부를 저장하는 bool
     private bool _isInRange = false; // 타겟이 감지 반경 안에 들어와 있는지 여부를 저장하는 bool
@@ -34,6 +35,7 @@ public class MonsterController : MonoBehaviour
         _monsterFSM   = GetComponent<MonsterFSM>();
 
         _monsterAttack = GetComponentInChildren<MonsterAttack>();
+        _monsterFOV    = GetComponentInChildren<MonsterFieldOfView>();
 
         _monsterFSM.OnStateChanged += OnStateChanged;
     }
@@ -77,13 +79,15 @@ public class MonsterController : MonoBehaviour
 
     private void Update()
     {
-        if (_target == null) return;
+        if (_target == null) return;        
 
         // 감지 상태에 따라 몬스터의 상태를 변경
         _monsterFSM.Evaluate(_isSensed, _isInRange);
 
         // 정해진 상태에 따라 몬스터 행동 실행
         MonsterAI();
+
+        _monsterFOV?.DrawFieldOfView(transform);
     }
 
     /// <summary>

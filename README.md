@@ -68,7 +68,7 @@ Update()               → FSM 상태 전환 및 TryAttack() 처리
 
 <br>
 
-### 자료구조 활용 (`AstarPathfinder.cs`, `MonsterSpawner.cs`, `MazeGenerator.cs`)
+### 자료구조 활용 (`AstarPathfinder.cs`, `UnitSpawner.cs`, `MazeGenerator.cs`)
 | 자료구조 | 활용 | 
 | --- | --- |
 | `List` | 경로 노드, 스폰 후보 셀, 몬스터 목록 관리 |
@@ -150,7 +150,7 @@ Attack --(공격 범위 이탈)--> Chase
 | 변수 | 위치 | 선택 이유 |
 |---|---|---|
 | `List<Vector3> _path` | `MonsterMove.cs` | A\* 경로 노드를 순서대로 저장, `_pathIndex++`로 순차 접근하므로 인덱스 기반 접근에 유리한 List 사용 |
-| `List<Cell> candidates` | `MonsterSpawner.cs` | 스폰 가능한 셀 필터링 후 저장, Fisher-Yates 셔플에서 인덱스 기반 교환이 필요하므로 List 사용 |
+| `List<Cell> candidates` | `UnitSpawner.cs` | 스폰 가능한 셀 필터링 후 저장, Fisher-Yates 셔플에서 인덱스 기반 교환이 필요하므로 List 사용 |
 
 <br>
 
