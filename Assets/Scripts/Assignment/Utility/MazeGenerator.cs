@@ -173,8 +173,8 @@ public class MazeGenerator : MonoBehaviour
                 Cell cell = _grid[c, r];
 
                 // 셀 중심 월드 좌표
-                float cx = worldStart.x + c * _cellSize + _cellSize * 0.5f;
-                float cz = worldStart.y + r * _cellSize + _cellSize * 0.5f;
+                float cx = cell.worldCenter.x;
+                float cz = cell.worldCenter.z;
 
                 if (cell.northWall)
                 {

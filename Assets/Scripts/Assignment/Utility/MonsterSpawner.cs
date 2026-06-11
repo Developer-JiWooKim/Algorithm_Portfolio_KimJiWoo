@@ -61,7 +61,7 @@ public class MonsterSpawner : MonoBehaviour
         for (int i = 0; i < monsterCount; i++)
         {
             // Cell.worldCenter로 몬스터 스폰해서 위치가 벽과 겹치지 않게
-            Vector3 spawnPos = candidates[Random.Range(0, candidates.Count)].worldCenter;
+            Vector3 spawnPos = candidates[i].worldCenter;
             spawnPos.y = spawnY;
 
             GameObject monster = Instantiate(monsterPrefab, spawnPos, Quaternion.identity);

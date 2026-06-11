@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class MonsterFSM : MonoBehaviour
@@ -14,7 +13,7 @@ public class MonsterFSM : MonoBehaviour
 
     public State Current => current;
 
-    public event Action<State> OnStateChanged;
+    public event System.Action<State> OnStateChanged;
 
     /// <summary>
     /// isSensed(시야각, 장애물 있는지 여부), isInRange(감지 범위 안에 들어와있는지 여부) 에 따라 현재 상태 결정하는 메소드

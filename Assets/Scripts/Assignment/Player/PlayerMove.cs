@@ -8,13 +8,19 @@ public class PlayerMove : MonoBehaviour
     public void Move(Vector3 moveDir, float moveSpeed)
     {
         // Vector3 정규화
-        moveDir = moveDir.normalized;
+        float distance = moveDir.magnitude;        
+        moveDir /= distance;
 
-        if (moveDir.sqrMagnitude > 0)
+        if (distance > 0)
         {
-            transform.Translate(moveDir * moveSpeed * Time.deltaTime, Space.World);
+            RotateToward(moveDir);
 
-            transform.rotation = Quaternion.LookRotation(moveDir, Vector3.up);
+            transform.Translate(moveDir * moveSpeed * Time.deltaTime, Space.World);            
         }
+    }
+
+    private void RotateToward(Vector3 dir)
+    {
+        transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
     }
 }

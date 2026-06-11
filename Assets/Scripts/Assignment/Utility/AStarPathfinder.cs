@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
 
 public class AStarPathfinder : MonoBehaviour
@@ -12,6 +11,7 @@ public class AStarPathfinder : MonoBehaviour
     private readonly Dictionary<Vector2Int, int>        _gCost          = new Dictionary<Vector2Int, int>();
     private readonly List<Vector2Int>                   _cachedPath     = new List<Vector2Int>();
     private readonly List<Vector2Int>                   _neighborResult = new List<Vector2Int>(4);
+    private readonly List<Vector3>                      _worldPath      = new List<Vector3>();
 
     private int _cost = 10; // 한 셀 이동 비용
 
@@ -121,15 +121,15 @@ public class AStarPathfinder : MonoBehaviour
             _cachedPath.RemoveAt(0);
         }
 
-        List<Vector3> worldPath = new List<Vector3>();
+        _worldPath.Clear();
 
         // 셀 인덱스를 월드 좌표로 변환
         foreach (Vector2Int node in _cachedPath)
         {
-            worldPath.Add(mazeGenerator.CellToWorld(node));
+            _worldPath.Add(mazeGenerator.CellToWorld(node));
         }           
 
-        return worldPath;
+        return _worldPath;
     }
 
     /// <summary>

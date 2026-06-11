@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -32,7 +31,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         // 플레이어 키보드 입력 감지
-        if (Keyboard.current is not null)
+        if (UnityEngine.InputSystem.Keyboard.current is not null)
         {
             _playerInput.InputKeyboardValue();
         }

@@ -18,12 +18,14 @@ public class MonsterSight : MonoBehaviour
     /// </summary>
     public bool TargetSense(Vector3 targetPos)
     {
-        // 방향 벡터 계산 후 정규화(xy 평면만)
-
         Vector3 myPos = transform.position;
+
         Vector3 dirToPlayer = targetPos - myPos; 
-        dirToPlayer.y = 0;  
-        dirToPlayer = dirToPlayer.normalized; 
+        dirToPlayer.y = 0;
+
+        // 정규화 작업(normalized)
+        float distance = dirToPlayer.magnitude; // 타겟과 자신 사이의 거리
+        dirToPlayer /= distance;                // (방향 / 거리) 로 정규화
 
         // 내적으로 자기자신의 앞(forward)와 타겟 방향의 사잇각 코사인 값 계산
         float dot = Vector3.Dot(transform.forward, dirToPlayer);    
@@ -41,9 +43,6 @@ public class MonsterSight : MonoBehaviour
         // 내 위치 기준 바닥에서 0.5f 위 지점
         Vector3 origin = myPos + Vector3.up * 0.5f;
 
-        // 타겟과 자신 사이의 거리
-        float distance = Vector3.Distance(myPos, targetPos);
-        
         // 시야각 안에 있어도 Ray를 쐈을 때 벽이 타겟과 자신 사이에 있으면 감지 실패
         if(Physics.Raycast(origin, dirToPlayer, distance, _wallLayerMask))
         {
@@ -68,10 +67,12 @@ public class MonsterSight : MonoBehaviour
     /// 에디터 확인용 기즈모(감지 범위, 시야각)
     /// </summary>
     private void OnDrawGizmos()
-    {     
+    {
+        Vector3 myPos = transform.position;
+
         // 감지 반경
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, detectionRange);
+        Gizmos.DrawWireSphere(myPos, detectionRange);
 
         // 시야각 경계선 (회전 행렬로 좌/우 벡터 계산)
         Vector3 fwd = transform.forward;
@@ -88,7 +89,7 @@ public class MonsterSight : MonoBehaviour
              fwd.x * Mathf.Sin(halfRad) + fwd.z * Mathf.Cos(halfRad));
 
         Gizmos.color = isSense ? Color.red : Color.yellow;
-        Gizmos.DrawRay(transform.position, leftDir * detectionRange);
-        Gizmos.DrawRay(transform.position, rightDir * detectionRange);
+        Gizmos.DrawRay(myPos, leftDir * detectionRange);
+        Gizmos.DrawRay(myPos, rightDir * detectionRange);
     }
 }

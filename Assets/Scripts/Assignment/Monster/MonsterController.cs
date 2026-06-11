@@ -10,11 +10,11 @@ public class MonsterController : MonoBehaviour
     private MonsterFSM    _monsterFSM;
     private MonsterAttack _monsterAttack;
 
-    private bool _isSensed   = false; // 타겟 감지 여부를 저장하는 bool
-    private bool _isInRange  = false; // 타겟이 감지 반경 안에 들어와 있는지 여부를 저장하는 bool
+    private bool _isSensed  = false; // 타겟 감지 여부를 저장하는 bool
+    private bool _isInRange = false; // 타겟이 감지 반경 안에 들어와 있는지 여부를 저장하는 bool
 
     private float _attackInterval = 3f;
-    private float _attackTimer = 0;
+    private float _attackTimer    = 0f;
 
     private Transform _target;
     public Transform Target

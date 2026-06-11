@@ -80,6 +80,7 @@ public class MonsterMove : MonoBehaviour
             }
 
             Vector3 myPos = transform.position;
+
             Vector3 nodePos = _path[_pathIndex];
             nodePos.y = myPos.y;
 
@@ -122,7 +123,9 @@ public class MonsterMove : MonoBehaviour
 
         float distance = direction.magnitude;
 
-        return !Physics.SphereCast(origin, _sphereCastRaduis, direction.normalized, out _, distance, _wallLayerMask);
+        Vector3 dirNormalized = direction / distance;
+
+        return !Physics.SphereCast(origin, _sphereCastRaduis, dirNormalized, out _, distance, _wallLayerMask);
     }
 
     /// <summary>
