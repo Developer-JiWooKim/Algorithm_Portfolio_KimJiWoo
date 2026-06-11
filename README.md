@@ -26,7 +26,7 @@
 
 ## 구현한 알고리즘
 
-### Input System + Transform 기반 플레이어 이동 `PlayerMove.cs`
+### Input System + Transform 기반 플레이어 이동 `PlayerMove.cs` `PlayerInput.cs` `PlayerController.cs`
 - `UnityEngine.InputSystem`의 `Keyboard.current`로 키 입력 감지
 - 입력 값을 `Vector3`로 변환 후 `.normalized`로 정규화
     - 대각 이동 시 벡터 크기가 √2가 되어 속도가 빨라지는 것을 방지
