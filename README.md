@@ -66,9 +66,17 @@
 
 ### sqrMagnitude 거리 기반 감지 (`MonsterSight.cs`)
 ```csharp
-dir.sqrMagnitude <= detectionRange * detectionRange // dir : 타겟 방향 벡터 / detectionRange : 감지 범위
+public bool IsInRange(Vector3 targetPos)
+{
+    // dir : 타겟 방향 벡터 / detectionRange : 감지 범위
+
+    Vector3 dir = targetPos - transform.position;
+    dir.y = 0f;
+
+    return dir.sqrMagnitude <= detectionRange * detectionRange;
+}
 ```
-- `Vector3.Distance()`는 내부적으로 sqrt를 호출해 연산 비용이 큼 → sqrt 없이 제곱값끼리 비교하기 위해 sqrMagnitude 사용
+- 거리 비교에서는 실제 거리값이 필요하지 않고 대소 비교만 하면 되므로 제곱값끼리 비교하는 `sqrMagnitude`를 사용해 연산 비용 절감
 
 <br>
 

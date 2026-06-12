@@ -31,11 +31,12 @@ public class MonsterSight : MonoBehaviour
         float distance = dirToPlayer.magnitude; // 타겟과 자신 사이의 거리
         dirToPlayer /= distance;                // (방향 / 거리) 로 정규화
 
-        // 내적으로 자기자신의 앞(forward)와 타겟 방향의 사잇각 코사인 값 계산
-        float dot = Vector3.Dot(transform.forward, dirToPlayer);    
+        // 내적으로 현재 바라보는 앞 방향(forward)과 타겟 방향의 사잇각(cosθ)을 계산(cosθ 값에 해당하는 float 값)
+        float dot = Vector3.Dot(transform.forward, dirToPlayer);
+
         dot = Mathf.Clamp(dot, -1, 1); // 내적값이 -1 ~ 1을 초과하지 못하게 방어
 
-        // 위에서 구한 코사인 값을 각도로 변환
+        // 위에서 구한 dot(float 값)을 라디안 변환(θ 각도) -> Mathf.Rad2Deg 곱해서 일반 각도로 변환
         float angle = Mathf.Acos(dot) * Mathf.Rad2Deg;
 
         // fieldOfView은 양측 전체 시야각이므로 절반과 비교
