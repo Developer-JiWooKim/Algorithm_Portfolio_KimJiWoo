@@ -136,12 +136,12 @@ Update()               → FSM 상태 전환 및 TryAttack() 처리
 4. 미방문 이웃이 없으면 스택에서 pop (백트래킹)
 5. 스택이 빌 때까지 반복 → 모든 셀 방문 완료
 ```
-- seed = -1이면 DateTime.Now.Millisecond로 매번 다른 미로
+- seed = -1이면 DateTime.Now.Millisecond로 매번 다른 미로 생성
     - 고정값 입력 시 항상 동일한 미로 재현 가능
 
 <br>
 
-### A\* 길찾기 알고리즘으로 타겟 추적 기능 구현 (`AStarPathfinder.cs`)
+### A\* 길찾기 알고리즘으로 목표 셀까지의 경로 생성 기능 구현 (`AStarPathfinder.cs`)
 - `F = G + H` 공식으로 시작 노드에서 목표 노드까지 최단 경로 탐색
 
 | 값 | 설명 |
