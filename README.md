@@ -190,7 +190,6 @@ Attack --(공격 범위 이탈)--> Chase
 | `List<Vector3> _path` | `MonsterMove.cs` | A\* 경로 노드를 순서대로 저장, `_pathIndex++`로 순차 접근하므로 인덱스 기반 접근에 유리한 List 사용 |
 | `List<Cell> candidates` | `UnitSpawner.cs` | 스폰 가능한 셀 필터링 후 저장, Fisher-Yates 셔플에서 인덱스 기반 교환이 필요하므로 List 사용 |
 
-<br>
 
 ### Dictionary
 
@@ -199,7 +198,6 @@ Attack --(공격 범위 이탈)--> Chase
 | `Dictionary<Vector2Int, Vector2Int> _cameFrom` | `AStarPathfinder.cs` | 각 노드의 부모 노드를 기록해 경로 역추적에 사용. 셀 좌표를 key로 빠른 접근이 필요하므로 Dictionary 사용 |
 | `Dictionary<Vector2Int, int> _gCost` | `AStarPathfinder.cs` | 각 노드까지의 이동 비용(g값) 저장. 이웃 노드 탐색 시 기존 비용과 새 비용 비교가 빈번하므로 key로 접근 가능한 Dictionary 사용 |
 
-<br>
 
 ### HashSet
 
