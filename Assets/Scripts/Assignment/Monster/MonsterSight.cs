@@ -9,6 +9,7 @@ public class MonsterSight : MonoBehaviour
     private int _wallLayerMask;
 
     public float DetectionRange => detectionRange;
+
     public float FieldOfView => fieldOfView;
 
     private void Awake()

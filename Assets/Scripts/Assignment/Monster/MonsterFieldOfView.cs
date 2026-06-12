@@ -81,7 +81,7 @@ public class MonsterFieldOfView : MonoBehaviour
 
             endPoint.y = meshHeight;
 
-            // monsterTransform 기준으로 로컬 변환
+            // monsterTransform 기준으로 로컬 변환(이 스크립트가 붙어있는 FieldOfView가 몬스터 프리팹의 자식으로 붙어있기 때문)
             _vertices[i + 1]   = monsterTransform.InverseTransformPoint(endPoint);
             _vertices[i + 1].y = 0f;
         }

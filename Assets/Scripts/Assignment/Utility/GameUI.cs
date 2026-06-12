@@ -56,7 +56,6 @@ public class GameUI : MonoBehaviour
         _gameEndButton.onClick.AddListener(GameManager.Instance.GameEnd);
     }
 
-
     private void Update()
     {
         if(_inGamePanel.activeSelf)

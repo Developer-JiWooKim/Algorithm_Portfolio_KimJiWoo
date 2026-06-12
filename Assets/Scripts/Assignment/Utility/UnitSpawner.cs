@@ -15,6 +15,7 @@ public class UnitSpawner : MonoBehaviour
     private Vector2Int _goalCell;        // 목표 지점 셀
 
     private GameObject _player;
+
     public PlayerController Player => _player?.GetComponent<PlayerController>();
 
     // 생성된 몬스터를 List로 관리
