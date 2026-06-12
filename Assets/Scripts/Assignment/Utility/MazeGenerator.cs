@@ -33,15 +33,15 @@ public class MazeGenerator : MonoBehaviour
     public int Rows  => _rows;
     public float CellSize => _cellSize;
 
-    // private void Awake() => Generate();
-
+    /// <summary>
+    /// 미로 사이즈 설정 메소드(UI에서 호출)
+    /// </summary>
     public void SetSize(int cols, int rows)
     {
         _cols = cols;
         _rows = rows;
 
         worldStart = new Vector2(-cols * _cellSize * 0.5f, -rows * _cellSize * 0.5f);
-        Debug.Log(worldStart);
     }
 
     /// <summary>
@@ -56,6 +56,9 @@ public class MazeGenerator : MonoBehaviour
         SpawnGoalPoint();
     }
 
+    /// <summary>
+    /// 목표 지점 오브젝트 스폰 메소드
+    /// </summary>
     private void SpawnGoalPoint()
     {
         if (goalPointPrefab == null) return;
@@ -89,6 +92,8 @@ public class MazeGenerator : MonoBehaviour
     /// </summary>
     private void InitGrid()
     {
+        _allCells.Clear();
+
         _grid = new Cell[_cols, _rows];
 
         for (int r = 0; r < _rows; r++)
@@ -96,6 +101,7 @@ public class MazeGenerator : MonoBehaviour
             for (int c = 0; c < _cols; c++)
             {
                 Vector3 center = new Vector3(worldStart.x + c * _cellSize + _cellSize * 0.5f, 0f, worldStart.y + r * _cellSize + _cellSize * 0.5f);
+
                 _grid[c, r] = new Cell(c, r, center);
                 _allCells.Add(_grid[c, r]);
             }

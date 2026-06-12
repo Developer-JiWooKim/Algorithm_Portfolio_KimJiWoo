@@ -4,11 +4,14 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+    public GameTimer GameTimer => _gameTimer;
+
+    private GameTimer _gameTimer;
+
+    private bool _isGameEnd = false;
 
     public event System.Action OnClear;
     public event System.Action OnGameOver;
-
-    private bool _isGameEnd = false;
 
     private void Awake()
     {
@@ -19,7 +22,14 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
-        }        
+        }
+
+        _gameTimer = new GameTimer();
+    }
+
+    private void Update()
+    {
+        _gameTimer.UpdateTime();
     }
 
     public void Clear()
@@ -27,6 +37,8 @@ public class GameManager : MonoBehaviour
         if (_isGameEnd) return;
 
         _isGameEnd = true;
+
+        _gameTimer.StopTimer();
 
         // 모든 몬스터 타겟 제거
         foreach (var monster in FindObjectsByType<MonsterController>())
@@ -37,11 +49,20 @@ public class GameManager : MonoBehaviour
         OnClear?.Invoke();
     }
 
+    public void GameStart()
+    {
+        _isGameEnd = false;
+
+        _gameTimer.StartTimer();
+    }
+
     public void GameOver()
     {
         if (_isGameEnd) return;
 
         _isGameEnd = true;
+
+        _gameTimer.StopTimer();
 
         OnGameOver?.Invoke();
     }

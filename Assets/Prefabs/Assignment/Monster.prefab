@@ -162,9 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94a9bf54901c50e4cb2b93f1887bd03b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterFieldOfView
-  detectionRange: 15
-  fieldOfView: 90
-  rayCount: 60
+  rayCount: 90
   meshHeight: 0.1
   fovMaterial: {fileID: 2100000, guid: 64c1fad5801f3014b8776440b58e4a04, type: 2}
 --- !u!33 &5408446105550700199

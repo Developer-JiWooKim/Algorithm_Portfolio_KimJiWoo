@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class UnitSpawner : MonoBehaviour
 {
-    [SerializeField] private MazeGenerator mazeGenerator;
+    [SerializeField] private MazeGenerator _mazeGenerator;
 
-    [SerializeField] private GameObject monsterPrefab;
-    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private GameObject _monsterPrefab;
+    [SerializeField] private GameObject _playerPrefab;
 
-    [SerializeField] private int monsterCount = 5;
-    [SerializeField] private float spawnY = 1f; // 유닛 스폰 y 좌표
+    [SerializeField] private int   _monsterCount = 5;
+    [SerializeField] private float _spawnY       = 1f; // 유닛 스폰 y 좌표
 
     private Vector2Int _playerStartCell; // 플레이어 시작 셀
     private Vector2Int _goalCell;        // 목표 지점 셀
@@ -20,20 +20,13 @@ public class UnitSpawner : MonoBehaviour
     // 생성된 몬스터를 List로 관리
     private List<GameObject> _monsters = new List<GameObject>();
     public List<GameObject> Monsters => _monsters;
-
-    private void Start()
-    {
-        Initialize();
-        SpawnAll();
-    }
-
+    
     /// <summary>
-    /// 초기화 메소드
+    /// 몬스터 수 설정 메소드(UI에서 호출)
     /// </summary>
-    private void Initialize()
+    public void SetMonsterCount(int count)
     {
-        _playerStartCell = new Vector2Int(0, 0);
-        _goalCell = new Vector2Int(mazeGenerator.Cols - 1, mazeGenerator.Rows - 1);
+        _monsterCount = count;
     }
 
     /// <summary>
@@ -42,29 +35,39 @@ public class UnitSpawner : MonoBehaviour
     public void SpawnAll()
     {
         ClearAll();
+        Initialize();
         SpawnPlayer();
         SpawnMonsters();
     }
 
+    private void Initialize()
+    {
+        _playerStartCell = new Vector2Int(0, 0);
+        _goalCell = new Vector2Int(_mazeGenerator.Cols - 1, _mazeGenerator.Rows - 1);
+    }
+
     private void SpawnPlayer()
     {
-        if (playerPrefab == null) return;
+        if (_playerPrefab == null) return;
 
-        Vector3 spawnPos = mazeGenerator.GetCell(_playerStartCell.x, _playerStartCell.y).worldCenter;
+        Vector3 spawnPos = _mazeGenerator.GetCell(_playerStartCell.x, _playerStartCell.y).worldCenter;
 
-        spawnPos.y = spawnY;
+        spawnPos.y = _spawnY;
 
-        _player = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
+        _player = Instantiate(_playerPrefab, spawnPos, Quaternion.identity);
+
+        FollowCamera followCamera = Camera.main.GetComponent<FollowCamera>();
+        followCamera.Target = _player.transform;
     }
 
     private void SpawnMonsters()
     {
-        if (monsterPrefab == null) return;
+        if (_monsterPrefab == null) return;
                 
         List<Cell> candidates = new List<Cell>();
 
         // 몬스터를 스폰 가능한 셀들 리스트에 추가
-        foreach (Cell cell in mazeGenerator.AllCells)
+        foreach (Cell cell in _mazeGenerator.AllCells)
         {
             // 플레이어 시작점 or 목표 지점에는 몬스터 생성 X
             if (cell.col == _playerStartCell.x && cell.row == _playerStartCell.y) continue;
@@ -80,14 +83,14 @@ public class UnitSpawner : MonoBehaviour
             (candidates[i], candidates[j]) = (candidates[j], candidates[i]);
         }
 
-        // monsterCount 수만큼 몬스터 스폰
-        for (int i = 0; i < monsterCount; i++)
+        // _monsterCount 수만큼 몬스터 스폰
+        for (int i = 0; i < _monsterCount; i++)
         {
             // Cell.worldCenter로 몬스터 스폰해서 위치가 벽과 겹치지 않게
             Vector3 spawnPos = candidates[i].worldCenter;
-            spawnPos.y = spawnY;
+            spawnPos.y = _spawnY;
 
-            GameObject monster = Instantiate(monsterPrefab, spawnPos, Quaternion.identity);
+            GameObject monster = Instantiate(_monsterPrefab, spawnPos, Quaternion.identity);
             MonsterController mc = monster.GetComponent<MonsterController>();
             if (mc != null && _player != null)
             {

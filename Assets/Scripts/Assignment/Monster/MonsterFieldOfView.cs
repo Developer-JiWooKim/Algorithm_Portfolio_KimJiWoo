@@ -4,17 +4,16 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 public class MonsterFieldOfView : MonoBehaviour
 {
-    [Header("Sight Setting")]
-    [SerializeField] private float detectionRange = 15f;
-    [SerializeField] private float fieldOfView = 90f;
-
     [Header("Mesh Quality")]
     [Tooltip("Ray 개수가 많을수록 부드럽지만 연산 비용 증가")]
-    [SerializeField] private int rayCount = 60;
+    [SerializeField] private int rayCount = 90;
 
     [Header("Rendering")]
     [SerializeField] private float    meshHeight = 0.1f;
     [SerializeField] private Material fovMaterial;
+
+    private float detectionRange = 0f;
+    private float fieldOfView    = 0f;
 
     private Mesh       _mesh;
     private MeshFilter _meshFilter;
@@ -40,6 +39,13 @@ public class MonsterFieldOfView : MonoBehaviour
         _triangles = new int[rayCount * 3];
 
         GetComponent<MeshRenderer>().material = fovMaterial;
+
+        MonsterSight sight = GetComponentInParent<MonsterSight>();
+
+        if (sight == null) return;
+
+        detectionRange = sight.DetectionRange;
+        fieldOfView    = sight.FieldOfView;
     }
 
     /// <summary>

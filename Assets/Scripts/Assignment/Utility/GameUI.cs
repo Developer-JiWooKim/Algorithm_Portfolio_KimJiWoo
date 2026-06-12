@@ -5,53 +5,81 @@ using UnityEngine.UI;
 public class GameUI : MonoBehaviour
 {
     [Header("Setup Panel")]
-    [SerializeField] private GameObject      setupPanel;
-    [SerializeField] private TMP_InputField  colsInputField;
-    [SerializeField] private TMP_InputField  rowsInputField;
-    [SerializeField] private GameObject      errorText;
-    [SerializeField] private Button          startButton;
-
-    [Header("참조")]
-    [SerializeField] private MazeGenerator mazeGenerator;
-    [SerializeField] private UnitSpawner   unitSpawner;
-
-    [Header("입력 제한")]
-    [SerializeField] private int minSize = 5;
-    [SerializeField] private int maxSize = 20;
+    [SerializeField] private GameObject      _setupPanel;
+    [SerializeField] private TMP_InputField  _colsInputField;
+    [SerializeField] private TMP_InputField  _rowsInputField;
+    [SerializeField] private TMP_InputField  _monsterCountInputField;
+    [SerializeField] private TextMeshProUGUI _errorText;
+    [SerializeField] private Button          _startButton;   
 
     [Header("Game Panel")]
-    [SerializeField] private TextMeshProUGUI hpText;
+    [SerializeField] private GameObject      _inGamePanel;
+    [SerializeField] private TextMeshProUGUI _hpText;
+    [SerializeField] private TextMeshProUGUI _timerText;
+    [SerializeField] private Button          _endButton;
 
     [Header("Result Panel")]
-    [SerializeField] private GameObject      resultPanel;
-    [SerializeField] private TextMeshProUGUI resultText;
-    [SerializeField] private Button          replayButton;
-    [SerializeField] private Button          gameEndButton;
+    [SerializeField] private GameObject      _resultPanel;
+    [SerializeField] private TextMeshProUGUI _resultText;
+    [SerializeField] private TextMeshProUGUI _mazeSizeText;
+    [SerializeField] private TextMeshProUGUI _resultTimeText;
+    [SerializeField] private Button          _replayButton;
+    [SerializeField] private Button          _gameEndButton;
 
-    private PlayerController player;
+    [Header("참조")]
+    [SerializeField] private MazeGenerator _mazeGenerator;
+    [SerializeField] private UnitSpawner   _unitSpawner;
+
+    private PlayerController _player;
+
+    private int _minSize = 5;
+    private int _maxSize = 50;
+
+    private int _maxMonsterCnt;
+
+    private string _errorTextString;
 
     private void Start()
     {
-        InitSetupPanel();
+        SubscribeButtonEvent();
+
+        _errorTextString = $"Please enter only positive integers\nMaze Size: Min:5 / Max:50\nMonster Count: Min:0 / Max:";
+
+        SetSetupPanel();
+    }
+
+    private void SubscribeButtonEvent()
+    {
+        _startButton.onClick.AddListener(OnStartButtonClicked);
+        _endButton.onClick.AddListener(() => GameManager.Instance.GameOver());
+        _replayButton.onClick.AddListener(GameManager.Instance.Replay);
+        _gameEndButton.onClick.AddListener(GameManager.Instance.GameEnd);
+    }
+
+
+    private void Update()
+    {
+        if(_inGamePanel.activeSelf)
+        {
+            _timerText.text = GameManager.Instance.GameTimer.GetFormattedTime();
+        }
     }
 
     /// <summary>
     /// Setup Panel 초기화, 게임 시작 전 미로 크기 설정
     /// </summary>
-    private void InitSetupPanel()
+    private void SetSetupPanel()
     {
-        colsInputField.text = mazeGenerator.Cols.ToString();
-        rowsInputField.text = mazeGenerator.Rows.ToString();
-        colsInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
-        rowsInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
-        errorText.SetActive(false);
+        _errorText.gameObject.SetActive(false);
 
-        startButton.onClick.AddListener(OnStartButtonClicked);
+        _colsInputField.contentType         = TMP_InputField.ContentType.IntegerNumber;
+        _rowsInputField.contentType         = TMP_InputField.ContentType.IntegerNumber;
+        _monsterCountInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
 
-        // Setup Panel 활성화, 게임 정지
-        setupPanel.SetActive(true);
-        resultPanel.SetActive(false);
-        Time.timeScale = 0f;
+        // 처음 게임 시작 시 -> Setup Panel 활성화, Result 패널 비활성화, Hp Text 비활성화
+        _setupPanel.SetActive(true);
+        _inGamePanel.SetActive(false);
+        _resultPanel.SetActive(false);
     }
 
     /// <summary>
@@ -59,42 +87,85 @@ public class GameUI : MonoBehaviour
     /// </summary>
     private void OnStartButtonClicked()
     {
-        if (!int.TryParse(colsInputField.text, out int cols) || !int.TryParse(rowsInputField.text, out int rows))
+        _errorText.gameObject.SetActive(false);
+
+        // 빈 값이면 기본값 적용(maze:10X10 / monsterCount:5)
+        if (string.IsNullOrEmpty(_colsInputField.text)) _colsInputField.text = "10";
+        if (string.IsNullOrEmpty(_rowsInputField.text)) _rowsInputField.text = "10";
+        if (string.IsNullOrEmpty(_monsterCountInputField.text)) _monsterCountInputField.text = "5";
+
+        // 입력값 정수 체크
+        if (!int.TryParse(_colsInputField.text, out int cols) ||
+            !int.TryParse(_rowsInputField.text, out int rows) ||
+            !int.TryParse(_monsterCountInputField.text, out int monsterCount))
         {
-            errorText.SetActive(true);
+            _maxMonsterCnt = 0;
+            ShowErrorText(_maxMonsterCnt);
             return;
         }
 
+        _maxMonsterCnt = cols * rows - 2; // 최대 몬스터 수는 셀 전체 개수 - 2(시작, 끝 지점)
+
+        // 몬스터 수가 음수거나 최대 수를 넘는지 체크
+        if (monsterCount < 0 || monsterCount > _maxMonsterCnt)
+        {
+            ShowErrorText(_maxMonsterCnt);
+            return;
+        }
+
+        // 미로 크기 최소/최대 값 사이인지 체크
+        if (cols < _minSize || cols > _maxSize ||
+            rows < _minSize || rows > _maxSize)
+        {
+            ShowErrorText(_maxMonsterCnt);
+            return;
+        }        
+
         // 미로 생성 + 유닛 스폰
-        mazeGenerator.SetSize(cols, rows);
-        mazeGenerator.Generate();
-        unitSpawner.SpawnAll();
+        _mazeGenerator.SetSize(cols, rows);
+        _mazeGenerator.Generate();
 
-        // Setup Panel 닫고 게임 시작
-        setupPanel.SetActive(false);
-        Time.timeScale = 1f;
+        _unitSpawner.SetMonsterCount(monsterCount);
+        _unitSpawner.SpawnAll();
 
-        // 스폰 후 PlayerController 참조 연결
-        player = unitSpawner.Player;
-        InitGamePanel();
+        // 유닛들(플레이어 포함) 스폰 후 PlayerController 참조 연결
+        _player = _unitSpawner.Player;
+
+        // Setup Panel 닫고 InGameUI 설정하고 게임 시작
+        _setupPanel.SetActive(false);
+
+        SetInGamePanel();
+    }
+
+    private void ShowErrorText(int count)
+    {
+        if(count <= 0)
+        {
+            _errorText.text = _errorTextString + "Col X Row - 2";
+        }
+        else
+        {
+            _errorText.text = _errorTextString + $"{count}";
+        }
+        
+        _errorText.gameObject.SetActive(true);
     }
 
     /// <summary>
     /// 게임 시작 후 HP UI, Result UI 초기화
     /// </summary>
-    private void InitGamePanel()
+    private void SetInGamePanel()
     {
-        player.OnHPChanged += UpdateHp;
-        player.OnDead += () => GameManager.Instance.GameOver();
+        _player.OnHPChanged += UpdateHp;
+        _player.OnDead      += () => GameManager.Instance.GameOver();
 
-        GameManager.Instance.OnClear += () => ShowResult("CLEAR!!");
+        GameManager.Instance.OnClear    += () => ShowResult("CLEAR!!");
         GameManager.Instance.OnGameOver += () => ShowResult("GAME OVER..");
 
-        replayButton.onClick.AddListener(GameManager.Instance.Replay);
-        gameEndButton.onClick.AddListener(GameManager.Instance.GameEnd);
+        _inGamePanel.SetActive(true);
 
-        resultPanel.SetActive(false);
-        UpdateHp(player.CurrentHp, player.MaxHp);
+        UpdateHp(_player.CurrentHp, _player.MaxHp);
+        GameManager.Instance.GameStart();
     }
 
     /// <summary>
@@ -102,10 +173,14 @@ public class GameUI : MonoBehaviour
     /// </summary>
     private void ShowResult(string message)
     {
-        resultText.text = message;
-        resultPanel.SetActive(true);
+        _inGamePanel.SetActive(false);
 
-        player.GetComponent<PlayerInput>().enabled = false;
+        _resultText.text = message;
+        _mazeSizeText.text   = $"Maze Size: {_mazeGenerator.Cols} X {_mazeGenerator.Rows}";
+        _resultTimeText.text = $"End Time : {GameManager.Instance.GameTimer.GetFormattedTime()}";
+        _resultPanel.SetActive(true);
+        
+        _player.GetComponent<PlayerInput>().enabled = false;
     }
 
     /// <summary>
@@ -113,6 +188,6 @@ public class GameUI : MonoBehaviour
     /// </summary>
     private void UpdateHp(int current, int max)
     {
-        hpText.text = $"HP : {current} / {max}";
+        _hpText.text = $"HP : {current} / {max}";
     }
 }

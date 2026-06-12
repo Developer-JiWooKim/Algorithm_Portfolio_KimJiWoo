@@ -8,15 +8,15 @@ public class PlayerMove : MonoBehaviour
     public void Move(Vector3 moveDir, float moveSpeed)
     {
         // Vector3 정규화
-        float distance = moveDir.magnitude;        
+        float distance = moveDir.magnitude;
+
+        if (distance < 0.001f) return;
+
         moveDir /= distance;
 
-        if (distance > 0)
-        {
-            RotateToward(moveDir);
+        RotateToward(moveDir);
 
-            transform.Translate(moveDir * moveSpeed * Time.deltaTime, Space.World);            
-        }
+        transform.Translate(moveDir * moveSpeed * Time.deltaTime, Space.World);       
     }
 
     private void RotateToward(Vector3 dir)
