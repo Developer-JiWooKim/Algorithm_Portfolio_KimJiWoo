@@ -207,7 +207,6 @@ Attack --(공격 범위 이탈)--> Chase
 |---|---|---|
 | `HashSet<Vector2Int> _closedSet` | `AStarPathfinder.cs` | 처리 완료 노드 저장 → 중복 탐색 방지. 매 이웃 노드마다 포함 여부를 확인하므로 해시 함수 기반으로 `O(1)` 검색이 가능한 HashSet 사용 (List의 `Contains`는 `O(n)`) |
 
-<br>
 
 ### Stack
 
