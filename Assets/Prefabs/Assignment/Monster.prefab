@@ -162,9 +162,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94a9bf54901c50e4cb2b93f1887bd03b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterFieldOfView
-  rayCount: 90
-  meshHeight: 0.1
-  fovMaterial: {fileID: 2100000, guid: 64c1fad5801f3014b8776440b58e4a04, type: 2}
+  _rayCount: 90
+  _meshHeight: 0.1
+  _fovMaterial: {fileID: 2100000, guid: 64c1fad5801f3014b8776440b58e4a04, type: 2}
 --- !u!33 &5408446105550700199
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -477,9 +477,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc40ee4ec93c7924b996750c8daca074, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterSight
-  detectionRange: 15
-  fieldOfView: 90
-  isSense: 0
+  _detectionRange: 15
+  _fieldOfView: 90
+  _isSense: 0
 --- !u!114 &5455248322757765073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -492,9 +492,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4d44ddb2a03bb440b8578a12700e668, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterMove
-  moveSpeed: 7
-  rotateSpeed: 15
-  nodeDistance: 0.5
+  _moveSpeed: 7
+  _rotateSpeed: 15
+  _nodeDistance: 0.5
 --- !u!114 &5455916527998377572
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -519,4 +519,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d8522d3160d2674690fc6321b24e958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterFSM
-  current: 0
+  _current: 0

@@ -9,15 +9,15 @@ public class MazeGenerator : MonoBehaviour
     [SerializeField] private float  _cellSize = 5f;    
 
     [Header("Walls")]
-    [SerializeField] private GameObject wallPrefab;
-    [SerializeField] private float      wallThickness = 0.3f;
-    [SerializeField] private float      wallHeight    = 3f;
+    [SerializeField] private GameObject _wallPrefab;
+    [SerializeField] private float      _wallThickness = 0.3f;
+    [SerializeField] private float      _wallHeight    = 3f;
 
     [Header("Goal Point")]
-    [SerializeField] private GameObject goalPointPrefab;
+    [SerializeField] private GameObject _goalPointPrefab;
 
     [Header("Random Seed")]
-    [SerializeField] private int seed = -1;    
+    [SerializeField] private int _seed = -1;    
 
     private Cell[,]          _grid;    
     private List<GameObject> _wallObjects = new List<GameObject>();
@@ -61,14 +61,14 @@ public class MazeGenerator : MonoBehaviour
     /// </summary>
     private void SpawnGoalPoint()
     {
-        if (goalPointPrefab == null) return;
+        if (_goalPointPrefab == null) return;
 
         Cell goalCell = _grid[_cols - 1, _rows - 1];
 
         Vector3 spawnPos = goalCell.worldCenter;
         spawnPos.y = 1f;
 
-        Instantiate(goalPointPrefab, spawnPos, Quaternion.identity);
+        Instantiate(_goalPointPrefab, spawnPos, Quaternion.identity);
     }
 
     /// <summary>
@@ -114,13 +114,13 @@ public class MazeGenerator : MonoBehaviour
     private void RunDFS()
     {
         // 매번 다른 맵이 나오도록 시드값 설정
-        if (seed == -1)
+        if (_seed == -1)
         {
             Random.InitState(System.DateTime.Now.Millisecond);
         }
         else
         {
-            Random.InitState(seed);
+            Random.InitState(_seed);
         }
 
         _dfsStack.Clear();
@@ -191,7 +191,7 @@ public class MazeGenerator : MonoBehaviour
     /// </summary>
     private void SpawnWalls()
     {
-        if (wallPrefab == null) return;
+        if (_wallPrefab == null) return;
 
         GameObject wallParent = new GameObject("Walls");
         wallParent.transform.SetParent(transform);
@@ -208,25 +208,25 @@ public class MazeGenerator : MonoBehaviour
 
                 if (cell.northWall)
                 {
-                    Vector3 pos = new Vector3(cx, wallHeight * 0.5f, cz + _cellSize * 0.5f);
+                    Vector3 pos = new Vector3(cx, _wallHeight * 0.5f, cz + _cellSize * 0.5f);
                     SpawnWall(pos, false, wallParent.transform);
                 }
 
                 if (cell.eastWall)
                 {
-                    Vector3 pos = new Vector3(cx + _cellSize * 0.5f, wallHeight * 0.5f, cz);
+                    Vector3 pos = new Vector3(cx + _cellSize * 0.5f, _wallHeight * 0.5f, cz);
                     SpawnWall(pos, true, wallParent.transform);
                 }
                 // southWall은 r == 0(맨 아래 행)일 때만 처리, 인접한 두 셀이 같은 벽을 중복 생성하지 않도록 하기 위해
                 if (r == 0 && cell.southWall)
                 {
-                    Vector3 pos = new Vector3(cx, wallHeight * 0.5f, cz - _cellSize * 0.5f);
+                    Vector3 pos = new Vector3(cx, _wallHeight * 0.5f, cz - _cellSize * 0.5f);
                     SpawnWall(pos, false, wallParent.transform);
                 }
                 // westWall은 c == 0 (맨 왼쪽 열)일 때만 처리, 인접한 두 셀이 같은 벽을 중복 생성하지 않도록 하기 위해
                 if (c == 0 && cell.westWall)
                 {
-                    Vector3 pos = new Vector3(cx - _cellSize * 0.5f, wallHeight * 0.5f, cz);
+                    Vector3 pos = new Vector3(cx - _cellSize * 0.5f, _wallHeight * 0.5f, cz);
                     SpawnWall(pos, true, wallParent.transform);
                 }
             }
@@ -238,11 +238,11 @@ public class MazeGenerator : MonoBehaviour
     /// </summary>
     private void SpawnWall(Vector3 position, bool isVertical, Transform parent)
     {
-        GameObject wall = Instantiate(wallPrefab, position, Quaternion.identity, parent);
+        GameObject wall = Instantiate(_wallPrefab, position, Quaternion.identity, parent);
 
         // 가로 벽: _cellSize 길이, X 방향으로 
         // 세로 벽: _cellSize 길이, Z 방향으로 
-        wall.transform.localScale = isVertical ? new Vector3(wallThickness, wallHeight, _cellSize) : new Vector3(_cellSize, wallHeight, wallThickness);
+        wall.transform.localScale = isVertical ? new Vector3(_wallThickness, _wallHeight, _cellSize) : new Vector3(_cellSize, _wallHeight, _wallThickness);
 
         _wallObjects.Add(wall);
     }

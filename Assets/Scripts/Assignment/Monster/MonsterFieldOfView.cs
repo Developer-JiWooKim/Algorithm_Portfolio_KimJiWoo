@@ -6,14 +6,14 @@ public class MonsterFieldOfView : MonoBehaviour
 {
     [Header("Mesh Quality")]
     [Tooltip("Ray 개수가 많을수록 부드럽지만 연산 비용 증가")]
-    [SerializeField] private int rayCount = 90;
+    [SerializeField] private int _rayCount = 90;
 
     [Header("Rendering")]
-    [SerializeField] private float    meshHeight = 0.1f;
-    [SerializeField] private Material fovMaterial;
+    [SerializeField] private float    _meshHeight = 0.1f;
+    [SerializeField] private Material _fovMaterial;
 
-    private float detectionRange = 0f;
-    private float fieldOfView    = 0f;
+    private float _detectionRange = 0f;
+    private float _fieldOfView    = 0f;
 
     private Mesh       _mesh;
     private MeshFilter _meshFilter;
@@ -35,17 +35,17 @@ public class MonsterFieldOfView : MonoBehaviour
         _mesh = new Mesh { name = "FieldOfViewMesh" };
         _meshFilter.mesh = _mesh;
 
-        _vertices  = new Vector3[rayCount + 2];
-        _triangles = new int[rayCount * 3];
+        _vertices  = new Vector3[_rayCount + 2];
+        _triangles = new int[_rayCount * 3];
 
-        GetComponent<MeshRenderer>().material = fovMaterial;
+        GetComponent<MeshRenderer>().material = _fovMaterial;
 
         MonsterSight sight = GetComponentInParent<MonsterSight>();
 
         if (sight == null) return;
 
-        detectionRange = sight.DetectionRange;
-        fieldOfView    = sight.FieldOfView;
+        _detectionRange = sight.DetectionRange;
+        _fieldOfView    = sight.FieldOfView;
     }
 
     /// <summary>
@@ -53,16 +53,16 @@ public class MonsterFieldOfView : MonoBehaviour
     /// </summary>
     public void DrawFieldOfView(Transform monsterTransform)
     {
-        float angleStep   = fieldOfView / rayCount;
-        float startAngle  = -fieldOfView * 0.5f;
+        float angleStep   = _fieldOfView / _rayCount;
+        float startAngle  = -_fieldOfView * 0.5f;
         float originAngle = monsterTransform.eulerAngles.y;
 
         Vector3 origin = monsterTransform.position;
-        origin.y = meshHeight;
+        origin.y = _meshHeight;
 
         _vertices[0] = Vector3.zero;
 
-        for (int i = 0; i <= rayCount; i++)
+        for (int i = 0; i <= _rayCount; i++)
         {
             float angle = originAngle + startAngle + angleStep * i;
             float rad = angle * Mathf.Deg2Rad;
@@ -70,23 +70,23 @@ public class MonsterFieldOfView : MonoBehaviour
 
             Vector3 endPoint;
 
-            if (Physics.Raycast(origin, direction, out RaycastHit hit, detectionRange, _wallLayerMask))
+            if (Physics.Raycast(origin, direction, out RaycastHit hit, _detectionRange, _wallLayerMask))
             {
                 endPoint = hit.point;
             }
             else
             {
-                endPoint = origin + direction * detectionRange;
+                endPoint = origin + direction * _detectionRange;
             }
 
-            endPoint.y = meshHeight;
+            endPoint.y = _meshHeight;
 
             // monsterTransform 기준으로 로컬 변환(이 스크립트가 붙어있는 FieldOfView가 몬스터 프리팹의 자식으로 붙어있기 때문)
             _vertices[i + 1]   = monsterTransform.InverseTransformPoint(endPoint);
             _vertices[i + 1].y = 0f;
         }
 
-        for (int i = 0; i < rayCount; i++)
+        for (int i = 0; i < _rayCount; i++)
         {
             _triangles[i * 3]     = 0;
             _triangles[i * 3 + 1] = i + 1;

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class AStarPathfinder : MonoBehaviour
 {
-    [SerializeField] private MazeGenerator mazeGenerator;
+    [SerializeField] private MazeGenerator _mazeGenerator;
 
     private readonly List<Vector2Int>                   _openSet        = new List<Vector2Int>();
     private readonly HashSet<Vector2Int>                _closedSet      = new HashSet<Vector2Int>();
@@ -35,7 +35,7 @@ public class AStarPathfinder : MonoBehaviour
     /// </summary>
     public Vector2Int WorldToCell(Vector3 worldPos)
     {
-        return mazeGenerator.WorldToCell(worldPos);
+        return _mazeGenerator.WorldToCell(worldPos);
     }
 
     /// <summary>
@@ -44,8 +44,8 @@ public class AStarPathfinder : MonoBehaviour
     public List<Vector3> FindPath(Vector3 startWorld, Vector3 goalWorld)
     {
         // 시작 지점과 목표지점의 셀을 구함
-        Vector2Int start = mazeGenerator.WorldToCell(startWorld);
-        Vector2Int goal  = mazeGenerator.WorldToCell(goalWorld);
+        Vector2Int start = _mazeGenerator.WorldToCell(startWorld);
+        Vector2Int goal  = _mazeGenerator.WorldToCell(goalWorld);
 
         // 시작 지점과 목표 지점이 같으면 null
         if (start == goal) return null;
@@ -126,7 +126,7 @@ public class AStarPathfinder : MonoBehaviour
         // 셀 인덱스를 월드 좌표로 변환
         foreach (Vector2Int node in _cachedPath)
         {
-            _worldPath.Add(mazeGenerator.CellToWorld(node));
+            _worldPath.Add(_mazeGenerator.CellToWorld(node));
         }           
 
         return _worldPath;
@@ -139,7 +139,7 @@ public class AStarPathfinder : MonoBehaviour
     {        
         _neighborResult.Clear();
 
-        Cell cell = mazeGenerator.GetCell(node.x, node.y);
+        Cell cell = _mazeGenerator.GetCell(node.x, node.y);
 
         if (cell == null) return _neighborResult;
 

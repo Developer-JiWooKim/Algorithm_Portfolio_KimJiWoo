@@ -2,15 +2,16 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 10f;
-    [SerializeField] private int   maxHp     = 3;
+    [SerializeField] private float _moveSpeed = 10f;
+    [SerializeField] private int   _maxHp     = 3;
 
     private PlayerInput _playerInput;
     private PlayerMove  _playerMove;
 
     private int _currentHp;
+
     public int CurrentHp => _currentHp;
-    public int MaxHp => maxHp;
+    public int MaxHp => _maxHp;
 
     public event System.Action<int, int> OnHPChanged;  // 체력이 변경됐을 때 (현재, 최대) 이벤트
     public event System.Action OnDead;                 // 플레이어 체력이 0이 되어 죽었을 때 이벤트 
@@ -25,7 +26,7 @@ public class PlayerController : MonoBehaviour
         _playerInput = GetComponent<PlayerInput>();
         _playerMove  = GetComponent<PlayerMove>();
 
-        _currentHp = maxHp;
+        _currentHp = _maxHp;
     }
 
     private void Update()
@@ -39,7 +40,7 @@ public class PlayerController : MonoBehaviour
             Vector3 dir = new Vector3(_playerInput.InputVector.x, 0, _playerInput.InputVector.y);
 
             // PlayerMove 컴포넌트에 방향과 속력을 전달해서 플레이어를 이동
-            _playerMove.Move(dir, moveSpeed);
+            _playerMove.Move(dir, _moveSpeed);
         }        
     }
 
@@ -52,7 +53,7 @@ public class PlayerController : MonoBehaviour
 
         _currentHp--;
 
-        OnHPChanged?.Invoke(_currentHp, maxHp);
+        OnHPChanged?.Invoke(_currentHp, _maxHp);
 
         if (_currentHp <= 0) OnDead?.Invoke();
     }

@@ -2,15 +2,15 @@ using UnityEngine;
 
 public class MonsterSight : MonoBehaviour
 {
-    [SerializeField] private float detectionRange = 15f;   // 감지 반경
-    [SerializeField] private float fieldOfView    = 90f;   // 전체 시야각
-    [SerializeField] private bool  isSense        = false; // 감지 여부
+    [SerializeField] private float _detectionRange = 15f;   // 감지 반경
+    [SerializeField] private float _fieldOfView    = 90f;   // 전체 시야각
+    [SerializeField] private bool  _isSense        = false; // 감지 여부
 
     private int _wallLayerMask;
 
-    public float DetectionRange => detectionRange;
+    public float DetectionRange => _detectionRange;
 
-    public float FieldOfView => fieldOfView;
+    public float FieldOfView => _fieldOfView;
 
     private void Awake()
     {
@@ -39,10 +39,10 @@ public class MonsterSight : MonoBehaviour
         // 위에서 구한 dot(float 값)을 라디안 변환(θ 각도) -> Mathf.Rad2Deg 곱해서 일반 각도로 변환
         float angle = Mathf.Acos(dot) * Mathf.Rad2Deg;
 
-        // fieldOfView은 양측 전체 시야각이므로 절반과 비교
-        if (angle >= fieldOfView * 0.5f)
+        // _fieldOfView은 양측 전체 시야각이므로 절반과 비교
+        if (angle >= _fieldOfView * 0.5f)
         {
-            return isSense = false;
+            return _isSense = false;
         }
 
         // 내 위치 기준 바닥에서 0.5f 위 지점
@@ -51,10 +51,10 @@ public class MonsterSight : MonoBehaviour
         // 시야각 안에 있어도 Ray를 쐈을 때 벽이 타겟과 자신 사이에 있으면 감지 실패
         if(Physics.Raycast(origin, dirToPlayer, distance, _wallLayerMask))
         {
-            return isSense = false;
+            return _isSense = false;
         }
 
-        return isSense = true;
+        return _isSense = true;
     }
     
     /// <summary>
@@ -65,7 +65,7 @@ public class MonsterSight : MonoBehaviour
         Vector3 dir = targetPos - transform.position;
         dir.y = 0f;
 
-        return dir.sqrMagnitude <= detectionRange * detectionRange;
+        return dir.sqrMagnitude <= _detectionRange * _detectionRange;
     }
 
     /// <summary>
@@ -77,11 +77,11 @@ public class MonsterSight : MonoBehaviour
 
         // 감지 반경
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(myPos, detectionRange);
+        Gizmos.DrawWireSphere(myPos, _detectionRange);
 
         // 시야각 경계선 (회전 행렬로 좌/우 벡터 계산)
         Vector3 fwd = transform.forward;
-        float halfRad = fieldOfView * 0.5f * Mathf.Deg2Rad;
+        float halfRad = _fieldOfView * 0.5f * Mathf.Deg2Rad;
 
         // 시야각 기준 왼쪽 경계
         Vector3 leftDir = new Vector3(
@@ -93,8 +93,8 @@ public class MonsterSight : MonoBehaviour
              fwd.x * Mathf.Cos(halfRad) - fwd.z * Mathf.Sin(halfRad), 0,
              fwd.x * Mathf.Sin(halfRad) + fwd.z * Mathf.Cos(halfRad));
 
-        Gizmos.color = isSense ? Color.red : Color.yellow;
-        Gizmos.DrawRay(myPos, leftDir * detectionRange);
-        Gizmos.DrawRay(myPos, rightDir * detectionRange);
+        Gizmos.color = _isSense ? Color.red : Color.yellow;
+        Gizmos.DrawRay(myPos, leftDir * _detectionRange);
+        Gizmos.DrawRay(myPos, rightDir * _detectionRange);
     }
 }

@@ -2,13 +2,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
-{
+{  
+    private GameTimer _gameTimer;
+    private bool      _isGameEnd = false;
+
     public static GameManager Instance { get; private set; }
     public GameTimer GameTimer => _gameTimer;
-
-    private GameTimer _gameTimer;
-
-    private bool _isGameEnd = false;
 
     public event System.Action OnClear;
     public event System.Action OnGameOver;

@@ -9,9 +9,9 @@ public class MonsterFSM : MonoBehaviour
         Attack,
     }
 
-    [SerializeField] private State current;
+    [SerializeField] private State _current;
 
-    public State Current => current;
+    public State Current => _current;
 
     public event System.Action<State> OnStateChanged;
 
@@ -54,10 +54,10 @@ public class MonsterFSM : MonoBehaviour
     /// </summary>
     private void TransitionTo(State next)
     {
-        if (current == next) return;
+        if (_current == next) return;
 
         OnStateChanged?.Invoke(next);
 
-        current = next;
+        _current = next;
     }
 }

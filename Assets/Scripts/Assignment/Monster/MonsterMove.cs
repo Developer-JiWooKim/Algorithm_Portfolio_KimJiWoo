@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class MonsterMove : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed    = 7f;   // 이동 속도
-    [SerializeField] private float rotateSpeed  = 15f;  // 회전 속도
-    [SerializeField] private float nodeDistance = 0.5f;
+    [SerializeField] private float _moveSpeed    = 7f;   // 이동 속도
+    [SerializeField] private float _rotateSpeed  = 15f;  // 회전 속도
+    [SerializeField] private float _nodeDistance = 0.5f;
 
     private List<Vector3> _path             = new List<Vector3>();
     private int           _pathIndex;
@@ -23,7 +23,7 @@ public class MonsterMove : MonoBehaviour
     /// </summary>
     public void IdleRotate()
     {
-        transform.Rotate(0f, rotateSpeed * Time.deltaTime, 0f, Space.World);
+        transform.Rotate(0f, _rotateSpeed * Time.deltaTime, 0f, Space.World);
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public class MonsterMove : MonoBehaviour
             nodePos.y = myPos.y;
 
             // 목표 노드에 도착 시 다음 노드로 목표 노드를 바꿈
-            if ((nodePos - myPos).sqrMagnitude < nodeDistance * nodeDistance)
+            if ((nodePos - myPos).sqrMagnitude < _nodeDistance * _nodeDistance)
             {
                 _pathIndex++;
                 return;
@@ -140,7 +140,7 @@ public class MonsterMove : MonoBehaviour
 
         RotateToward(dir);
 
-        transform.Translate(dir.normalized * moveSpeed * Time.deltaTime, Space.World);
+        transform.Translate(dir.normalized * _moveSpeed * Time.deltaTime, Space.World);
     }
 
     /// <summary>
@@ -151,6 +151,6 @@ public class MonsterMove : MonoBehaviour
         Quaternion targetRotation = Quaternion.LookRotation(dir, Vector3.up);
 
         // 부드러운 회전
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotateSpeed);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * _rotateSpeed);
     }
 }
