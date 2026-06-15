@@ -93,6 +93,29 @@ public bool IsInRange(Vector3 targetPos)
 
 <br>
 
+### 내적 시야 감지 (`MonsterSight.cs`)
+- `dirToPlayer.y = 0` 으로 XZ 평면(수평)으로 변환 후 정규화 (`dirToPlayer` : 내 위치에서 플레이어 방향 벡터)
+
+- `Vector3.Dot()`으로 몬스터 `forward`와 플레이어 방향의 사잇각 코사인 값 계산
+
+- `Mathf.Clamp(dot, -1, 1)` 처리 : 부동소수점 오차로 dot이 범위를 벗어나면 `Mathf.Acos`가 NaN을 반환하므로 반드시 Clamp로 방어 처리
+
+- `Mathf.Acos(dot) * Mathf.Rad2Deg`로 각도 변환 후 `fieldOfView * 0.5f`와 비교 
+    - `fieldOfView`는 양측 전체 시야각, 위 계산으로 나온 `angle`은 forward 기준 편측 각도이므로 절반과 비교
+
+- 시야각 판별 후 `Physics.Raycast()`로 몬스터→플레이어 방향으로 Ray를 쏴 벽이 가로막고 있으면 감지 실패 처리
+
+<br>
+
+### 시야각 메시 시각화 (`MonsterFieldOfView.cs`)
+- 시야각 범위 안에서 일정 간격으로 Ray를 발사해 끝점을 이어 부채꼴 Mesh 생성
+
+- 벽(LayerMask:`Wall`)에 맞으면 그 지점까지만, 안 맞으면 `MonsterSight.cs`의 `detectionRange`까지 메시 생성
+
+- 벽 뒤는 Ray가 막혀서 자동으로 가려짐 → 실제 감지 범위와 시각적으로 일치
+
+<br>
+
 ### 충돌 이벤트(Collider - Trigger 이벤트) (`MonterAttack.cs`)
 - 몬스터 자식 오브젝트의 `Sphere Collider (Is Trigger = true)`로 공격 범위 구현
 
@@ -121,29 +144,6 @@ Update()               → FSM 상태 전환 및 TryAttack() 처리
 | `Dictionary` | A* 탐색에서 g비용, 경로 역추적 부모 노드 저장 |
 | `HashSet` | A* 탐색에서 처리 완료 노드 저장 (중복 탐색 방지) |
 | `Stack` | DFS 미로 생성에서 백트래킹 구현 (LIFO 구조) |
-
-<br>
-
-### 내적 시야 감지 (`MonsterSight.cs`)
-- `dirToPlayer.y = 0` 으로 XZ 평면(수평)으로 변환 후 정규화 (`dirToPlayer` : 내 위치에서 플레이어 방향 벡터)
-
-- `Vector3.Dot()`으로 몬스터 `forward`와 플레이어 방향의 사잇각 코사인 값 계산
-
-- `Mathf.Clamp(dot, -1, 1)` 처리 : 부동소수점 오차로 dot이 범위를 벗어나면 `Mathf.Acos`가 NaN을 반환하므로 반드시 Clamp로 방어 처리
-
-- `Mathf.Acos(dot) * Mathf.Rad2Deg`로 각도 변환 후 `fieldOfView * 0.5f`와 비교 
-    - `fieldOfView`는 양측 전체 시야각, 위 계산으로 나온 `angle`은 forward 기준 편측 각도이므로 절반과 비교
-
-- 시야각 판별 후 `Physics.Raycast()`로 몬스터→플레이어 방향으로 Ray를 쏴 벽이 가로막고 있으면 감지 실패 처리
-
-<br>
-
-### 시야각 메시 시각화 (`MonsterFieldOfView.cs`)
-- 시야각 범위 안에서 일정 간격으로 Ray를 발사해 끝점을 이어 부채꼴 Mesh 생성
-
-- 벽(LayerMask:`Wall`)에 맞으면 그 지점까지만, 안 맞으면 `MonsterSight.cs`의 `detectionRange`까지 메시 생성
-
-- 벽 뒤는 Ray가 막혀서 자동으로 가려짐 → 실제 감지 범위와 시각적으로 일치
 
 <br>
 
@@ -177,6 +177,13 @@ Update()               → FSM 상태 전환 및 TryAttack() 처리
 
 <br>
 
+### SphereCast 최적화 (`MonsterMove.cs`)
+- `Physics.SphereCast`로 몬스터와 플레이어 사이에 벽 존재 여부를 먼저 확인
+    - `Raycast`(선 하나)와 달리 구체를 굴려 체크하므로 몬스터 크기를 고려한 더 정확한 판단
+- 직선 경로가 열려있으면 A\* 계산을 생략 → 몬스터 수가 많을수록 효과가 큼
+
+<br>
+
 ### FSM 상태 전이 (`MonsterFSM.cs`)
 
 ```
@@ -193,13 +200,6 @@ Attack --(공격 범위 이탈)--> Chase
 | `Idle` | 제자리 회전하며 시야각 내 플레이어 감지 대기 |
 | `Chase` | 플레이어 감지 시 추격 시작. 직선 경로에 벽이 없으면 직선 이동, 있으면 A* 알고리즘으로 구한 경로로 이동. 탐지 거리 이탈 시 Idle로 전환 |
 | `Attack` | 공격 범위 진입 시 즉시 1 데미지. 3초 후에도 범위 안에 있으면 반복 데미지. 범위 이탈 시 Chase로 복귀 |
-
-<br>
-
-### SphereCast 최적화 (`MonsterMove.cs`)
-- `Physics.SphereCast`로 몬스터와 플레이어 사이에 벽 존재 여부를 먼저 확인
-    - `Raycast`(선 하나)와 달리 구체를 굴려 체크하므로 몬스터 크기를 고려한 더 정확한 판단
-- 직선 경로가 열려있으면 A\* 계산을 생략 → 몬스터 수가 많을수록 효과가 큼
 
 ---
 
