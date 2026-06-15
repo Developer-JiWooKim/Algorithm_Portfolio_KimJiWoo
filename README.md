@@ -28,7 +28,7 @@
     - 클리어 여부 표시
     - 설정한 미로 크기(Col X Row) 표시
     - 끝낸 시간 표시
-    - RePlay 버튼 → Setting UI로 돌아감(씬 재시작)
+    - Replay 버튼 → Setting UI로 돌아감(씬 재시작)
     - Exit 버튼 → 종료(에디터 플레이 종료)
 
 ---
