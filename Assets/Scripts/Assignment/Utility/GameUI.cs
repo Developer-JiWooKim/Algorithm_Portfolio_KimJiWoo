@@ -138,7 +138,7 @@ public class GameUI : MonoBehaviour
 
     private void ShowErrorText(int count)
     {
-        if(count <= 0)
+        if(count <= 0 ||  count > _maxSize * _maxSize - 2 )
         {
             _errorText.text = _errorTextString + "Col X Row - 2";
         }
