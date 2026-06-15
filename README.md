@@ -33,6 +33,14 @@
 
 ---
 
+## 실행 화면
+
+<img src="Assets/Scrrenshos/gameplay1.png" width="800">
+
+<img src="Assets/Scrrenshos/gameplay2.png" width="800">
+
+---
+
 ## 조작 방법
 
 | 키 | 동작 |
