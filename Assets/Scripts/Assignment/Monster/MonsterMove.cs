@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class MonsterMove : MonoBehaviour
 {
-    [SerializeField] private float _moveSpeed    = 7f;   // 이동 속도
-    [SerializeField] private float _rotateSpeed  = 15f;  // 회전 속도
+    [SerializeField] private float _moveSpeed    = 7f;   
+    [SerializeField] private float _rotateSpeed  = 15f;  
     [SerializeField] private float _nodeDistance = 0.5f;
 
     private List<Vector3> _path             = new List<Vector3>();
     private int           _pathIndex;
     private Vector2Int    _lastGoalCell     = Vector2Int.zero;
-    private float         _sphereCastRaduis = 0.5f; // SphereCast 구체 Radius
+    private float         _sphereCastRaduis = 0.5f; 
     private int           _wallLayerMask;
 
     private void Awake()
@@ -49,7 +49,7 @@ public class MonsterMove : MonoBehaviour
     }
 
     /// <summary>
-    /// AStar 알고리즘으로 생성한 길 초기화
+    /// A* 알고리즘으로 생성한 길 초기화
     /// </summary>
     public void ClearPath()
     {
@@ -118,7 +118,7 @@ public class MonsterMove : MonoBehaviour
 
         Vector3 origin = myPos + Vector3.up * 0.5f;
 
-        Vector3 direction = (targetPos - myPos);
+        Vector3 direction = targetPos - myPos;
         direction.y = 0;
 
         float distance = direction.magnitude;
@@ -136,11 +136,15 @@ public class MonsterMove : MonoBehaviour
         Vector3 dir = targetPos - transform.position;
         dir.y = 0f;
 
-        if (dir.sqrMagnitude < 0.001f) return;
+        float distance = dir.magnitude;
 
-        RotateToward(dir);
+        if (distance < 0.001f) return;
 
-        transform.Translate(dir.normalized * _moveSpeed * Time.deltaTime, Space.World);
+        dir /= distance; // 정규화
+
+        RotateToward(dir);       
+
+        transform.Translate(dir * _moveSpeed * Time.deltaTime, Space.World);
     }
 
     /// <summary>

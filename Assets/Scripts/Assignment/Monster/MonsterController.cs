@@ -26,7 +26,7 @@ public class MonsterController : MonoBehaviour
 
     private void Start() => Initialize();
     /// <summary>
-    /// 초기화 메소드, 컴포넌트 할당, 이벤트 구독
+    /// 초기화 메소드
     /// </summary>
     private void Initialize()
     {
@@ -87,6 +87,7 @@ public class MonsterController : MonoBehaviour
         // 정해진 상태에 따라 몬스터 행동 실행
         MonsterAI();
 
+        // 몬스터 시야 메시 그리기
         _monsterFOV?.DrawFieldOfView(transform);
     }
 

@@ -5,7 +5,7 @@ using UnityEngine;
 /// </summary>
 public class FollowCamera : MonoBehaviour
 {   
-    [SerializeField] private float     _smoothTime = 0.3f; // 높을수록 더 느리게 따라감
+    [SerializeField] private float _smoothTime = 0.3f; // 높을수록 더 느리게 따라감
 
     private Vector3   _velocity     = Vector3.zero;
     private Vector3   _cameraOffset = new Vector3(0, 20f, 0);

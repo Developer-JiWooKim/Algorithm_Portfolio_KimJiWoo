@@ -70,7 +70,7 @@ public class UnitSpawner : MonoBehaviour
         // 몬스터를 스폰 가능한 셀들 리스트에 추가
         foreach (Cell cell in _mazeGenerator.AllCells)
         {
-            // 플레이어 시작점 or 목표 지점에는 몬스터 생성 X
+            // 플레이어 시작점, 목표 지점에는 몬스터 생성 X
             if (cell.col == _playerStartCell.x && cell.row == _playerStartCell.y) continue;
             if (cell.col == _goalCell.x && cell.row == _goalCell.y) continue;
 

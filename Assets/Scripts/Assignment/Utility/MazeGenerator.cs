@@ -34,7 +34,7 @@ public class MazeGenerator : MonoBehaviour
     public float CellSize => _cellSize;
 
     /// <summary>
-    /// 미로 사이즈 설정 메소드(UI에서 호출)
+    /// 미로 사이즈 설정 메소드
     /// </summary>
     public void SetSize(int cols, int rows)
     {
@@ -264,8 +264,6 @@ public class MazeGenerator : MonoBehaviour
     /// <summary>
     /// 셀 위치를 월드 좌표로 변환하는 메소드
     /// </summary>
-    /// <param name="cell"></param>
-    /// <returns></returns>
     public Vector3 CellToWorld(Vector2Int cell)
     {
         return _grid[cell.x, cell.y].worldCenter;
@@ -277,6 +275,7 @@ public class MazeGenerator : MonoBehaviour
     public Cell GetCell(int col, int row)
     {
         if (col < 0 || col >= _cols || row < 0 || row >= _rows) return null;
+
         return _grid[col, row];
     }
 

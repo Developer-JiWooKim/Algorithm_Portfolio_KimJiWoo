@@ -29,7 +29,7 @@ public class MonsterSight : MonoBehaviour
 
         // 정규화 작업(normalized)
         float distance = dirToPlayer.magnitude; // 타겟과 자신 사이의 거리
-        dirToPlayer /= distance;                // (방향 / 거리) 로 정규화
+        dirToPlayer /= distance;                // (타겟 방향 벡터 / 이 벡터의 길이(거리)) 로 정규화
 
         // 내적으로 현재 바라보는 앞 방향(forward)과 타겟 방향의 사잇각(cosθ)을 계산(cosθ 값에 해당하는 float 값)
         float dot = Vector3.Dot(transform.forward, dirToPlayer);

@@ -148,7 +148,7 @@ public class AStarPathfinder : MonoBehaviour
         // false면 벽 없음 - 이동 가능
         if (!cell.northWall) _neighborResult.Add(new Vector2Int(node.x,     node.y + 1));
         if (!cell.southWall) _neighborResult.Add(new Vector2Int(node.x,     node.y - 1));
-        if (!cell.eastWall ) _neighborResult.Add(new Vector2Int(node.x + 1, node.y));
+        if (!cell.eastWall)  _neighborResult.Add(new Vector2Int(node.x + 1, node.y));
         if (!cell.westWall)  _neighborResult.Add(new Vector2Int(node.x - 1, node.y));
 
         return _neighborResult;

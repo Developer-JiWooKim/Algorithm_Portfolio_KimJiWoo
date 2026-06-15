@@ -22,11 +22,10 @@ public class MonsterFieldOfView : MonoBehaviour
     private Vector3[] _vertices;
     private int[]     _triangles;
 
-    private void Awake()
-    {
-        Initialize();
-    }
-
+    private void Awake() => Initialize();
+    /// <summary>
+    /// 초기화 메소드
+    /// </summary>
     private void Initialize()
     {
         _meshFilter = GetComponent<MeshFilter>();
@@ -36,7 +35,14 @@ public class MonsterFieldOfView : MonoBehaviour
         _meshFilter.mesh = _mesh;
 
         _vertices  = new Vector3[_rayCount + 2];
+
         _triangles = new int[_rayCount * 3];
+        for (int i = 0; i < _rayCount; i++)
+        {
+            _triangles[i * 3] = 0;
+            _triangles[i * 3 + 1] = i + 1;
+            _triangles[i * 3 + 2] = i + 2;
+        }
 
         GetComponent<MeshRenderer>().material = _fovMaterial;
 
@@ -84,13 +90,6 @@ public class MonsterFieldOfView : MonoBehaviour
             // monsterTransform 기준으로 로컬 변환(이 스크립트가 붙어있는 FieldOfView가 몬스터 프리팹의 자식으로 붙어있기 때문)
             _vertices[i + 1]   = monsterTransform.InverseTransformPoint(endPoint);
             _vertices[i + 1].y = 0f;
-        }
-
-        for (int i = 0; i < _rayCount; i++)
-        {
-            _triangles[i * 3]     = 0;
-            _triangles[i * 3 + 1] = i + 1;
-            _triangles[i * 3 + 2] = i + 2;
         }
 
         _mesh.Clear();
