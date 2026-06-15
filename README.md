@@ -35,9 +35,14 @@
 
 ## 실행 화면
 
-<img src="Assets/Scrrenshos/gameplay1.png" width="800">
+- 게임 실행 화면
+<img src="Assets/Screenshots/gameplay1.png" width="800">
 
-<img src="Assets/Scrrenshos/gameplay2.png" width="800">
+- 게임 플레이
+<img src="Assets/Screenshots/gameplay2.png" width="800">
+
+- 게임 클리어
+<img src="Assets/Screenshots/gameplay3.png" width="800">
 
 ---
 
