@@ -116,6 +116,13 @@ public bool IsInRange(Vector3 targetPos)
 
 <br>
 
+### SphereCast 최적화 (`MonsterMove.cs`)
+- `Physics.SphereCast`로 몬스터와 플레이어 사이에 벽 존재 여부를 먼저 확인
+    - `Raycast`(선 하나)와 달리 구체를 굴려 체크하므로 몬스터 크기를 고려한 더 정확한 판단
+- 직선 경로가 열려있으면 A\* 계산을 생략 → 몬스터 수가 많을수록 효과가 큼
+
+<br>
+
 ### 충돌 이벤트(Collider - Trigger 이벤트) (`MonterAttack.cs`)
 - 몬스터 자식 오브젝트의 `Sphere Collider (Is Trigger = true)`로 공격 범위 구현
 
@@ -174,13 +181,6 @@ Update()               → FSM 상태 전환 및 TryAttack() 처리
 - **간선** : Cell의 벽 정보 (클래스 내부 bool형 변수들)로 판단, 벽이 없는 방향만 이웃으로 추가
 - 목표 도달 시 `cameFrom`을 역방향으로 따라가 경로 복원 후 `Reverse()`
 - 첫 번째 노드 (현재 몬스터가 있는 셀 중앙) 제거 → 몬스터가 플레이어(타겟) 추격 중 갑자기 자신이 위치한 셀 중앙으로 이동하는 현상 해결
-
-<br>
-
-### SphereCast 최적화 (`MonsterMove.cs`)
-- `Physics.SphereCast`로 몬스터와 플레이어 사이에 벽 존재 여부를 먼저 확인
-    - `Raycast`(선 하나)와 달리 구체를 굴려 체크하므로 몬스터 크기를 고려한 더 정확한 판단
-- 직선 경로가 열려있으면 A\* 계산을 생략 → 몬스터 수가 많을수록 효과가 큼
 
 <br>
 
